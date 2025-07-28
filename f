@@ -420,7 +420,8 @@ spawnBtn.MouseButton1Click:Connect(function()
         weight, age = parseWeightAndAgeFromName(tool.Name)
     end
 
-    Spawner.SpawnPet(duplicatingPetName, weight, age)
+    local basePetName = getBasePetName(duplicatingPetName)
+    Spawner.SpawnPet(basePetName, tonumber(weight), tonumber(age))
     task.wait(5)
     errorMsgFrame:Destroy()
 end)
