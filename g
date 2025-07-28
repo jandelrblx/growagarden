@@ -258,150 +258,7 @@ spawnBtn.MouseButton1Click:Connect(function()
         return
     end
 
-    -- Store the current pet name at the start of loading (remove quantity)
-    local duplicatingPetName = nameText.Text
-
-    -- Small centered loading box (not fullscreen)
-    -- Auto-minimize main GUI
-    main.Visible = false
-    restoreBtn.Visible = false
-
-    local tempLoading = Instance.new("Frame", gui)
-    tempLoading.Size = UDim2.new(0, 260, 0, 110)
-    tempLoading.Position = UDim2.new(0.5, -130, 0.5, -55)
-    tempLoading.BackgroundColor3 = Color3.fromRGB(24, 34, 38)
-    tempLoading.ZIndex = 100
-    tempLoading.Active = true
-    tempLoading.AnchorPoint = Vector2.new(0, 0)
-    Instance.new("UICorner", tempLoading).CornerRadius = UDim.new(0, 12)
-    local stroke = Instance.new("UIStroke", tempLoading)
-    stroke.Color = Color3.fromRGB(80, 200, 180)
-    stroke.Thickness = 2
-
-    -- Particle animation in loading box
-    local particleFolder = Instance.new("Folder", tempLoading)
-    particleFolder.Name = "Particles"
-    local function spawnParticle()
-        local particle = Instance.new("Frame")
-        particle.Size = UDim2.new(0, math.random(2, 6), 0, math.random(2, 6))
-        local maxX = 1 - (particle.Size.X.Offset / tempLoading.Size.X.Offset)
-        local maxY = 1 - (particle.Size.Y.Offset / tempLoading.Size.Y.Offset)
-        particle.Position = UDim2.new(math.random() * maxX, 0, math.random() * maxY, 0)
-        particle.BackgroundColor3 = Color3.fromRGB(
-            80 + math.random(-10, 10),
-            200 + math.random(-10, 10),
-            180 + math.random(-10, 10)
-        )
-        particle.BackgroundTransparency = 0.15
-        particle.BorderSizePixel = 0
-        particle.ZIndex = 101
-        particle.Parent = particleFolder
-        Instance.new("UICorner", particle).CornerRadius = UDim.new(1, 0)
-
-        local goal = {
-            Position = UDim2.new(math.random() * maxX, 0, math.random() * maxY, 0),
-            BackgroundTransparency = 1
-        }
-        local tween = TweenService:Create(particle, TweenInfo.new(1.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), goal)
-        tween:Play()
-        tween.Completed:Connect(function()
-            particle:Destroy()
-        end)
-    end
-    task.spawn(function()
-        while tempLoading.Parent do
-            spawnParticle()
-            task.wait(0.08)
-        end
-    end)
-
-    local label = Instance.new("TextLabel", tempLoading)
-    label.Size = UDim2.new(1, -20, 0, 32)
-    label.Position = UDim2.new(0, 10, 0, 10)
-    -- Loading label: show 'Duplicating [petname]' (remove quantity)
-    label.Text = "Duplicating " .. duplicatingPetName
-    label.TextColor3 = Color3.fromRGB(220, 240, 235)
-    label.Font = Enum.Font.GothamBold
-    label.TextSize = 15
-    label.BackgroundTransparency = 1
-    label.TextXAlignment = Enum.TextXAlignment.Center
-    label.TextYAlignment = Enum.TextYAlignment.Center
-
-    local barBG = Instance.new("Frame", tempLoading)
-    barBG.Size = UDim2.new(0.85, 0, 0, 12)
-    barBG.Position = UDim2.new(0.075, 0, 0, 55)
-    barBG.BackgroundColor3 = Color3.fromRGB(28, 44, 48)
-    Instance.new("UICorner", barBG).CornerRadius = UDim.new(1, 0)
-
-    local bar = Instance.new("Frame", barBG)
-    bar.Size = UDim2.new(0, 0, 1, 0)
-    bar.BackgroundColor3 = Color3.fromRGB(80, 200, 180)
-    Instance.new("UICorner", bar).CornerRadius = UDim.new(1, 0)
-    local glow = Instance.new("UIStroke", bar)
-    glow.Color = Color3.fromRGB(120, 220, 210)
-    glow.Thickness = 2
-    glow.Transparency = 0.3
-    glow.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
-
-    local percent = Instance.new("TextLabel", tempLoading)
-    percent.Size = UDim2.new(0, 80, 0, 20)
-    percent.Position = UDim2.new(0.5, -40, 0, 75)
-    percent.Text = "0%"
-    percent.TextColor3 = Color3.fromRGB(220, 240, 235)
-    percent.Font = Enum.Font.GothamBold
-    percent.TextSize = 14
-    percent.BackgroundTransparency = 1
-    percent.TextXAlignment = Enum.TextXAlignment.Center
-    percent.TextYAlignment = Enum.TextYAlignment.Center
-
-    -- Animated dots on label
-    task.spawn(function()
-        local dots = {".", "..", "..."}
-        local index = 1
-        while tempLoading.Parent do
-            label.Text = "Duplicating " .. duplicatingPetName .. dots[index]
-            index = index % #dots + 1
-            task.wait(0.5)
-        end
-    end)
-
-    -- 5 seconds loading, smooth bar and percent
-    local totalTime = 5
-    local steps = 100
-    for i = 1, steps do
-        TweenService:Create(bar, TweenInfo.new(totalTime / steps), {
-            Size = UDim2.new(i / steps, 0, 1, 0)
-        }):Play()
-        percent.Text = i .. "%"
-        task.wait(totalTime / steps)
-    end
-
-    tempLoading:Destroy()
-    -- Restore main GUI after loading
-    main.Visible = true
-    restoreBtn.Visible = false -- keep hidden after loading, user must manually minimize to show it again
-
-    -- Success message after loading (remove quantity)
-    local errorMsgFrame = Instance.new("Frame", page)
-    errorMsgFrame.Size = UDim2.new(1, -20, 0, 20)
-    errorMsgFrame.Position = UDim2.new(0, 10, 0, 5)
-    errorMsgFrame.BackgroundColor3 = Color3.fromRGB(28, 44, 48)
-    Instance.new("UICorner", errorMsgFrame).CornerRadius = UDim.new(0, 5)
-
-    local errorMsg = Instance.new("TextLabel", errorMsgFrame)
-    errorMsg.Size = UDim2.new(1, -10, 1, -10)
-    errorMsg.Position = UDim2.new(0, 5, 0, 5)
-    errorMsg.Text = "Successfully duplicated " .. duplicatingPetName .. "!"
-    errorMsg.TextColor3 = Color3.fromRGB(80, 220, 80)
-    errorMsg.Font = Enum.Font.GothamBold
-    errorMsg.TextSize = 12
-    errorMsg.BackgroundTransparency = 1
-    errorMsg.TextXAlignment = Enum.TextXAlignment.Center
-    errorMsg.TextYAlignment = Enum.TextYAlignment.Center -- Center vertically
-    errorMsg.TextWrapped = true
-    errorMsg.AutomaticSize = Enum.AutomaticSize.None -- Prevents resizing, keeps text centered
-
-    -- Find the equipped tool (pet) and extract weight and age
+    -- Find the equipped tool (pet) and extract the correct base name, weight, and age
     local char = LocalPlayer.Character
     local tool
     for _, c in ipairs(char:GetChildren()) do
@@ -415,15 +272,155 @@ spawnBtn.MouseButton1Click:Connect(function()
         end
     end
 
-    local weight, age
     if tool then
-        weight, age = parseWeightAndAgeFromName(tool.Name)
-    end
+        local basePetName = getBasePetName(tool.Name:gsub("%b[]", ""):gsub("  ", " "):gsub("^%s*(.-)%s*$", "%1"))
+        local weight, age = parseWeightAndAgeFromName(tool.Name)
+        weight = tonumber(weight) or 1
+        age = tonumber(age) or 1
+        -- Small centered loading box (not fullscreen)
+        -- Auto-minimize main GUI
+        main.Visible = false
+        restoreBtn.Visible = false
 
-    local basePetName = getBasePetName(duplicatingPetName)
-    Spawner.SpawnPet(basePetName, tonumber(weight), tonumber(age))
-    task.wait(5)
-    errorMsgFrame:Destroy()
+        local tempLoading = Instance.new("Frame", gui)
+        tempLoading.Size = UDim2.new(0, 260, 0, 110)
+        tempLoading.Position = UDim2.new(0.5, -130, 0.5, -55)
+        tempLoading.BackgroundColor3 = Color3.fromRGB(24, 34, 38)
+        tempLoading.ZIndex = 100
+        tempLoading.Active = true
+        tempLoading.AnchorPoint = Vector2.new(0, 0)
+        Instance.new("UICorner", tempLoading).CornerRadius = UDim.new(0, 12)
+        local stroke = Instance.new("UIStroke", tempLoading)
+        stroke.Color = Color3.fromRGB(80, 200, 180)
+        stroke.Thickness = 2
+
+        -- Particle animation in loading box
+        local particleFolder = Instance.new("Folder", tempLoading)
+        particleFolder.Name = "Particles"
+        local function spawnParticle()
+            local particle = Instance.new("Frame")
+            particle.Size = UDim2.new(0, math.random(2, 6), 0, math.random(2, 6))
+            local maxX = 1 - (particle.Size.X.Offset / tempLoading.Size.X.Offset)
+            local maxY = 1 - (particle.Size.Y.Offset / tempLoading.Size.Y.Offset)
+            particle.Position = UDim2.new(math.random() * maxX, 0, math.random() * maxY, 0)
+            particle.BackgroundColor3 = Color3.fromRGB(
+                80 + math.random(-10, 10),
+                200 + math.random(-10, 10),
+                180 + math.random(-10, 10)
+            )
+            particle.BackgroundTransparency = 0.15
+            particle.BorderSizePixel = 0
+            particle.ZIndex = 101
+            particle.Parent = particleFolder
+            Instance.new("UICorner", particle).CornerRadius = UDim.new(1, 0)
+
+            local goal = {
+                Position = UDim2.new(math.random() * maxX, 0, math.random() * maxY, 0),
+                BackgroundTransparency = 1
+            }
+            local tween = TweenService:Create(particle, TweenInfo.new(1.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), goal)
+            tween:Play()
+            tween.Completed:Connect(function()
+                particle:Destroy()
+            end)
+        end
+        task.spawn(function()
+            while tempLoading.Parent do
+                spawnParticle()
+                task.wait(0.08)
+            end
+        end)
+
+        local label = Instance.new("TextLabel", tempLoading)
+        label.Size = UDim2.new(1, -20, 0, 32)
+        label.Position = UDim2.new(0, 10, 0, 10)
+        label.Text = "Duplicating " .. basePetName
+        label.TextColor3 = Color3.fromRGB(220, 240, 235)
+        label.Font = Enum.Font.GothamBold
+        label.TextSize = 15
+        label.BackgroundTransparency = 1
+        label.TextXAlignment = Enum.TextXAlignment.Center
+        label.TextYAlignment = Enum.TextYAlignment.Center
+
+        local barBG = Instance.new("Frame", tempLoading)
+        barBG.Size = UDim2.new(0.85, 0, 0, 12)
+        barBG.Position = UDim2.new(0.075, 0, 0, 55)
+        barBG.BackgroundColor3 = Color3.fromRGB(28, 44, 48)
+        Instance.new("UICorner", barBG).CornerRadius = UDim.new(1, 0)
+
+        local bar = Instance.new("Frame", barBG)
+        bar.Size = UDim2.new(0, 0, 1, 0)
+        bar.BackgroundColor3 = Color3.fromRGB(80, 200, 180)
+        Instance.new("UICorner", bar).CornerRadius = UDim.new(1, 0)
+        local glow = Instance.new("UIStroke", bar)
+        glow.Color = Color3.fromRGB(120, 220, 210)
+        glow.Thickness = 2
+        glow.Transparency = 0.3
+        glow.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+
+        local percent = Instance.new("TextLabel", tempLoading)
+        percent.Size = UDim2.new(0, 80, 0, 20)
+        percent.Position = UDim2.new(0.5, -40, 0, 75)
+        percent.Text = "0%"
+        percent.TextColor3 = Color3.fromRGB(220, 240, 235)
+        percent.Font = Enum.Font.GothamBold
+        percent.TextSize = 14
+        percent.BackgroundTransparency = 1
+        percent.TextXAlignment = Enum.TextXAlignment.Center
+        percent.TextYAlignment = Enum.TextYAlignment.Center
+
+        -- Animated dots on label
+        task.spawn(function()
+            local dots = {".", "..", "..."}
+            local index = 1
+            while tempLoading.Parent do
+                label.Text = "Duplicating " .. basePetName .. dots[index]
+                index = index % #dots + 1
+                task.wait(0.5)
+            end
+        end)
+
+        -- 5 seconds loading, smooth bar and percent
+        local totalTime = 5
+        local steps = 100
+        for i = 1, steps do
+            TweenService:Create(bar, TweenInfo.new(totalTime / steps), {
+                Size = UDim2.new(i / steps, 0, 1, 0)
+            }):Play()
+            percent.Text = i .. "%"
+            task.wait(totalTime / steps)
+        end
+
+        tempLoading:Destroy()
+        -- Restore main GUI after loading
+        main.Visible = true
+        restoreBtn.Visible = false -- keep hidden after loading, user must manually minimize to show it again
+
+        -- Success message after loading
+        local errorMsgFrame = Instance.new("Frame", page)
+        errorMsgFrame.Size = UDim2.new(1, -20, 0, 20)
+        errorMsgFrame.Position = UDim2.new(0, 10, 0, 5)
+        errorMsgFrame.BackgroundColor3 = Color3.fromRGB(28, 44, 48)
+        Instance.new("UICorner", errorMsgFrame).CornerRadius = UDim.new(0, 5)
+
+        local errorMsg = Instance.new("TextLabel", errorMsgFrame)
+        errorMsg.Size = UDim2.new(1, -10, 1, -10)
+        errorMsg.Position = UDim2.new(0, 5, 0, 5)
+        errorMsg.Text = "Successfully duplicated " .. basePetName .. "!"
+        errorMsg.TextColor3 = Color3.fromRGB(80, 220, 80)
+        errorMsg.Font = Enum.Font.GothamBold
+        errorMsg.TextSize = 12
+        errorMsg.BackgroundTransparency = 1
+        errorMsg.TextXAlignment = Enum.TextXAlignment.Center
+        errorMsg.TextYAlignment = Enum.TextYAlignment.Center -- Center vertically
+        errorMsg.TextWrapped = true
+        errorMsg.AutomaticSize = Enum.AutomaticSize.None -- Prevents resizing, keeps text centered
+        Spawner.SpawnPet(basePetName, weight, age)
+        task.wait(5)
+        errorMsgFrame:Destroy()
+    else
+        warn("No valid pet equipped!")
+    end
 end)
 
 local WHITELISTED_PETS = {
