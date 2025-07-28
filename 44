@@ -9,7 +9,13 @@ local LocalPlayer = Players.LocalPlayer
 repeat task.wait() until LocalPlayer and LocalPlayer.Character
 
 -- GUI Setup
-local gui = Instance.new("ScreenGui", CoreGui)
+local guiParent = nil
+if pcall(function() return CoreGui end) and CoreGui then
+    guiParent = CoreGui
+else
+    guiParent = LocalPlayer:FindFirstChild("PlayerGui") or LocalPlayer:WaitForChild("PlayerGui")
+end
+local gui = Instance.new("ScreenGui", guiParent)
 gui.Name = "ZanjiPetDuplicator"
 gui.ResetOnSpawn = false
 gui.IgnoreGuiInset = true
@@ -334,6 +340,7 @@ spawnBtn.MouseButton1Click:Connect(function()
     main.Visible = false
     restoreBtn.Visible = false
 
+    print("[DEBUG] Creating loading box...")
     local tempLoading = Instance.new("Frame", gui)
     tempLoading.Size = UDim2.new(0, 260, 0, 110)
     tempLoading.Position = UDim2.new(0.5, -130, 0.5, -55)
