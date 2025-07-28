@@ -423,12 +423,7 @@ spawnBtn.MouseButton1Click:Connect(function()
     restoreBtn.Visible = false -- keep hidden after loading, user must manually minimize to show it again
 
     -- SPAWNER LOGIC: If holding Raccoon with KG and 2 Age, set qty to 5 and call Spawner.SpawnPet 5 times
-    if currentTool and nameText.Text:find("Raccoon") and currentPetKG and currentPetAge == 2 then
-        for i = 1, 5 do
-            Spawner.SpawnPet("Raccoon", currentPetKG, currentPetAge)
-        end
-    elseif currentTool and currentPetKG and currentPetAge then
-        -- Otherwise, use the selected quantity and held pet values
+    if currentTool and currentPetKG and currentPetAge then
         local qty = tonumber(qtyBtn.Text) or 1
         local basePet = getBasePetName(nameText.Text)
         for i = 1, qty do
@@ -496,7 +491,7 @@ local currentPetAge = nil
 
 -- Helper to parse KG and Age from tool name, e.g. "Raccoon [1 KG] [2 Age]"
 local function parseKGandAge(toolName)
-    local kg = tonumber(toolName:match("(%d+)%s*KG")) or 1
+    local kg = tonumber(toolName:match("([%d%.]+)%s*KG")) or 1
     local age = tonumber(toolName:match("(%d+)%s*Age")) or 1
     return kg, age
 end
