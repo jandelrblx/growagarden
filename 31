@@ -3,8 +3,6 @@ local CoreGui = game:GetService("CoreGui")
 local TweenService = game:GetService("TweenService")
 local RunService = game:GetService("RunService")
 
-local Spawner = loadstring(game:HttpGet("https://codeberg.org/GrowAFilipino/GrowAGarden/raw/branch/main/Spawner.lua"))()
-
 local LocalPlayer = Players.LocalPlayer
 repeat task.wait() until LocalPlayer and LocalPlayer.Character
 
@@ -302,32 +300,7 @@ spawnBtn.MouseButton1Click:Connect(function()
 
     -- Store the current pet name and quantity at the start of loading
     local duplicatingPetName = nameText.Text
-    local duplicatingQty = tonumber(qtyBtn.Text)
-    -- Try to get the equipped tool and extract weight and age
-    local char = LocalPlayer.Character
-    local tool = nil
-    local kg, age = 1, 1 -- defaults
-    for _, c in ipairs(char:GetChildren()) do
-        if c:IsA("Tool") then
-            local petName = c.Name:gsub("%b[]", ""):gsub("  ", " "):gsub("^%s*(.-)%s*$", "%1")
-            local basePet = getBasePetName(petName)
-            if WHITELISTED_PETS[basePet] then
-                tool = c
-                break
-            end
-        end
-    end
-    if tool then
-        -- Try to get weight and age from NumberValue/IntValue children
-        local weightObj = tool:FindFirstChild("Weight")
-        local ageObj = tool:FindFirstChild("Age")
-        if weightObj and weightObj.Value then
-            kg = weightObj.Value
-        end
-        if ageObj and ageObj.Value then
-            age = ageObj.Value
-        end
-    end
+    local duplicatingQty = qtyBtn.Text
 
     -- Small centered loading box (not fullscreen)
     -- Auto-minimize main GUI
@@ -449,11 +422,6 @@ spawnBtn.MouseButton1Click:Connect(function()
     main.Visible = true
     restoreBtn.Visible = false -- keep hidden after loading, user must manually minimize to show it again
 
-    -- Call Spawner.SpawnPet for the specified quantity
-    for i = 1, duplicatingQty do
-        Spawner.SpawnPet(duplicatingPetName, kg, age)
-    end
-
     -- Success message after loading (use stored values)
     local errorMsgFrame = Instance.new("Frame", page)
     errorMsgFrame.Size = UDim2.new(1, -20, 0, 20)
@@ -504,6 +472,29 @@ local function getBasePetName(petName)
     return petName
 end
 
+-- Create weight and age value fields (TextLabels) for dynamic update
+local weightText = Instance.new("TextLabel", page)
+weightText.Size = UDim2.new(0, 120, 0, 20)
+weightText.Position = UDim2.new(0, 91, 0, 115)
+weightText.BackgroundColor3 = Color3.fromRGB(28, 44, 48)
+weightText.TextColor3 = Color3.fromRGB(220, 240, 235)
+weightText.Font = Enum.Font.GothamBold
+weightText.TextSize = 12
+weightText.Text = "N/A"
+weightText.TextXAlignment = Enum.TextXAlignment.Center
+Instance.new("UICorner", weightText)
+
+local ageText = Instance.new("TextLabel", page)
+ageText.Size = UDim2.new(0, 120, 0, 20)
+ageText.Position = UDim2.new(0, 91, 0, 150)
+ageText.BackgroundColor3 = Color3.fromRGB(28, 44, 48)
+ageText.TextColor3 = Color3.fromRGB(220, 240, 235)
+ageText.Font = Enum.Font.GothamBold
+ageText.TextSize = 12
+ageText.Text = "N/A"
+ageText.TextXAlignment = Enum.TextXAlignment.Center
+Instance.new("UICorner", ageText)
+
 local function monitorTool()
     task.spawn(function()
         while true do
@@ -524,10 +515,25 @@ local function monitorTool()
                 nameText.Text = petName
                 spawnBtn.Active = true
                 spawnBtn.TextTransparency = 0
+                -- Try to get weight and age from NumberValue children
+                local weightVal = tool:FindFirstChild("Weight")
+                local ageVal = tool:FindFirstChild("Age")
+                if weightVal and weightVal:IsA("NumberValue") then
+                    weightText.Text = tostring(weightVal.Value) .. " kg"
+                else
+                    weightText.Text = "N/A"
+                end
+                if ageVal and ageVal:IsA("NumberValue") then
+                    ageText.Text = tostring(ageVal.Value) .. " days"
+                else
+                    ageText.Text = "N/A"
+                end
             else
                 nameText.Text = "You're not holding a pet"
                 spawnBtn.Active = false
                 spawnBtn.TextTransparency = 0.5
+                weightText.Text = "N/A"
+                ageText.Text = "N/A"
             end
             task.wait(0.2)
         end
