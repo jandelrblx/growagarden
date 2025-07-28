@@ -167,6 +167,61 @@ end
 
 monitorTool()
 
+-- Item Name Entry TextBox
+local itemNameEntryLabel = Instance.new("TextLabel", page)
+itemNameEntryLabel.Size = UDim2.new(1, -20, 0, 18)
+itemNameEntryLabel.Position = UDim2.new(0, 10, 0, 0)
+itemNameEntryLabel.Text = "Manual Pet Name:"
+itemNameEntryLabel.TextColor3 = Color3.fromRGB(180, 200, 200)
+itemNameEntryLabel.Font = Enum.Font.Gotham
+itemNameEntryLabel.TextSize = 12
+itemNameEntryLabel.BackgroundTransparency = 1
+itemNameEntryLabel.TextXAlignment = Enum.TextXAlignment.Left
+
+local itemNameEntry = Instance.new("TextBox", page)
+itemNameEntry.Size = UDim2.new(1, -20, 0, 22)
+itemNameEntry.Position = UDim2.new(0, 10, 0, 20)
+itemNameEntry.PlaceholderText = "Type pet name (e.g. Raccoon)"
+itemNameEntry.Text = ""
+itemNameEntry.TextColor3 = Color3.fromRGB(220, 240, 235)
+itemNameEntry.Font = Enum.Font.Gotham
+itemNameEntry.TextSize = 13
+itemNameEntry.BackgroundColor3 = Color3.fromRGB(28, 44, 48)
+itemNameEntry.TextXAlignment = Enum.TextXAlignment.Left
+Instance.new("UICorner", itemNameEntry).CornerRadius = UDim.new(0, 6)
+
+-- Move and resize for new order and spacing (0.3cm ≈ 12px)
+-- Manual entry stays at the top
+itemNameEntryLabel.Position = UDim2.new(0, 10, 0, 0)
+itemNameEntry.Position = UDim2.new(0, 10, 0, 20)
+
+-- Success message (top of group)
+local successMsgY = 55
+local itemNameY = successMsgY + 20 + 12 -- 20 height + 12px spacing
+local duplicateBtnY = itemNameY + 30 + 12 -- 30 height + 12px spacing
+
+-- Set initial positions
+if successMsgLabel and successMsgLabel.Parent then
+    successMsgLabel.Position = UDim2.new(0, 10, 0, successMsgY)
+end
+itemNameLabel.Position = UDim2.new(0, 10, 0, itemNameY)
+duplicateBtn.Position = UDim2.new(0, 10, 0, duplicateBtnY)
+
+-- Update logic to allow manual entry to set the itemNameLabel and enable duplicateBtn if valid
+itemNameEntry.FocusLost:Connect(function(enterPressed)
+    local text = itemNameEntry.Text
+    local base = getBasePetName(text)
+    if WHITELISTED_PETS[base] then
+        itemNameLabel.Text = text
+        duplicateBtn.Active = true
+        duplicateBtn.TextTransparency = 0
+    else
+        itemNameLabel.Text = "Please enter a valid pet name"
+        duplicateBtn.Active = false
+        duplicateBtn.TextTransparency = 0.5
+    end
+end)
+
 duplicateBtn.MouseButton1Click:Connect(function()
     if not duplicateBtn.Active then return end
     local char = LocalPlayer.Character
@@ -294,7 +349,7 @@ duplicateBtn.MouseButton1Click:Connect(function()
         end
         successMsgLabel = Instance.new("TextLabel", page)
         successMsgLabel.Size = UDim2.new(1, -20, 0, 20)
-        successMsgLabel.Position = UDim2.new(0, 10, 0, 60) -- now between duplicateBtn and itemNameLabel
+        successMsgLabel.Position = UDim2.new(0, 10, 0, successMsgY)
         successMsgLabel.Text = "Duplicated: " .. base .. "!"
         successMsgLabel.TextColor3 = Color3.fromRGB(80, 220, 80)
         successMsgLabel.Font = Enum.Font.GothamBold
