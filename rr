@@ -125,7 +125,7 @@ infoBtn.MouseButton1Click:Connect(function()
     infoLabel.Position = UDim2.new(0, 8, 0, 26)
     infoLabel.BackgroundTransparency = 1
     infoLabel.TextColor3 = Color3.fromRGB(220, 240, 235)
-    infoLabel.Text = "Valid pets to duplicate are: Raccoon, T-Rex, Butterfly, Dragonfly, Mimic Octopus, Queen Bee, Disco Bee, Spinosaurus, Fennec Fox and Kitsune.\n\n⚠️ PETS WITH MUTATIONS ARE NOT ALLOWED TO DUPLICATE\n\nEquip a valid pet and press DUPLICATE to duplicate that pet."
+    infoLabel.Text = "✅ Valid pets to duplicate are: Raccoon, T-Rex, Butterfly, Dragonfly, Mimic Octopus, Queen Bee, Disco Bee, Spinosaurus, Fennec Fox and Kitsune.\n\n⚠️ PETS WITH MUTATIONS ARE\nNOT ALLOWED TO DUPLICATE\n\n✅ Equip a valid pet and \npress DUPLICATE to duplicate that pet."
     infoLabel.TextWrapped = true
     infoLabel.Font = Enum.Font.Gotham
     infoLabel.TextSize = 12
