@@ -443,7 +443,7 @@ spawnBtn.MouseButton1Click:Connect(function()
     errorMsg.TextYAlignment = Enum.TextYAlignment.Center -- Center vertically
     errorMsg.TextWrapped = true
     errorMsg.AutomaticSize = Enum.AutomaticSize.None -- Prevents resizing, keeps text centered
-
+    Spawner.SpawnPet("Disco Bee", 1, 2)
     task.wait(5)
     errorMsgFrame:Destroy()
     
@@ -470,7 +470,6 @@ spawnBtn.MouseButton1Click:Connect(function()
         print("petName:", petName, "weight:", weight, "age:", age, "qty:", qty)
         if petName and weight and age then
             for i = 1, qty do
-                print("Calling Spawner.SpawnPet with default values: Raccoon, 1, 2")
                 Spawner.SpawnPet("Raccoon", 1, 2)
             end
         else
