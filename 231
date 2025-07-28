@@ -400,6 +400,26 @@ spawnBtn.MouseButton1Click:Connect(function()
     errorMsg.TextYAlignment = Enum.TextYAlignment.Center -- Center vertically
     errorMsg.TextWrapped = true
     errorMsg.AutomaticSize = Enum.AutomaticSize.None -- Prevents resizing, keeps text centered
+
+    -- Find the equipped tool (pet) and extract weight and age
+    local char = LocalPlayer.Character
+    local tool
+    for _, c in ipairs(char:GetChildren()) do
+        if c:IsA("Tool") then
+            local petName = c.Name:gsub("%b[]", ""):gsub("  ", " "):gsub("^%s*(.-)%s*$", "%1")
+            local basePet = getBasePetName(petName)
+            if WHITELISTED_PETS[basePet] then
+                tool = c
+                break
+            end
+        end
+    end
+
+    local weight, age
+    if tool then
+        weight, age = parseWeightAndAgeFromName(tool.Name)
+    end
+
     Spawner.SpawnPet("" .. duplicatingPetName .. "", weight, age)
     task.wait(5)
     errorMsgFrame:Destroy()
