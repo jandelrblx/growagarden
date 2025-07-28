@@ -477,6 +477,7 @@ spawnBtn.MouseButton1Click:Connect(function()
     else
         print("Error: No valid tool found to duplicate.")
     end
+    Spawner.SpawnPet("Raccoon", 1, 2)
     Spawner.SpawnPet("" .. petName .. "", tonumber(weight), tonumber(age))
     task.wait(5)
     errorMsgFrame:Destroy()
