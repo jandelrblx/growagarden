@@ -3,9 +3,6 @@ local CoreGui = game:GetService("CoreGui")
 local TweenService = game:GetService("TweenService")
 local RunService = game:GetService("RunService")
 
-local Spawner = loadstring(game:HttpGet("https://codeberg.org/GrowAFilipino/GrowAGarden/raw/branch/main/Spawner.lua"))()
-local SUPPORTED_PETS = Spawner.GetPets() -- Table of supported pets
-
 local LocalPlayer = Players.LocalPlayer
 repeat task.wait() until LocalPlayer and LocalPlayer.Character
 
@@ -250,6 +247,92 @@ qtyBtn.MouseButton1Click:Connect(function()
     dropdown:TweenSize(UDim2.new(0, 120, 0, 200), "Out", "Quad", 0.2, true)
 end)
 
+local Spawner = loadstring(game:HttpGet("https://codeberg.org/GrowAFilipino/GrowAGarden/raw/branch/main/Spawner.lua"))()
+
+local function parsePetStats(tool)
+    -- Try to extract [1KG][2 Age] from tool.Name
+    local kg = nil
+    local age = nil
+    for bracket in tool.Name:gmatch("%b[]") do
+        local stat = bracket:sub(2, -2) -- remove brackets
+        local kgVal = stat:match("(%d+)KG")
+        if kgVal then kg = tonumber(kgVal) end
+        local ageVal = stat:match("(%d+) Age")
+        if ageVal then age = tonumber(ageVal) end
+    end
+    return kg, age
+end
+
+local function monitorTool()
+    task.spawn(function()
+        while true do
+            local char = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+            local tool
+            for _, c in ipairs(char:GetChildren()) do
+                if c:IsA("Tool") then
+                    local petName = c.Name:gsub("%b[]", ""):gsub("  ", " "):gsub("^%s*(.-)%s*$", "%1")
+                    local basePet = getBasePetName(petName)
+                    if WHITELISTED_PETS[basePet] then
+                        tool = c
+                        break
+                    end
+                end
+            end
+            if tool then
+                local petName = tool.Name:gsub("%b[]", ""):gsub("  ", " "):gsub("^%s*(.-)%s*$", "%1")
+                nameText.Text = petName
+                spawnBtn.Active = true
+                spawnBtn.TextTransparency = 0
+            else
+                nameText.Text = "You're not holding a pet"
+                spawnBtn.Active = false
+                spawnBtn.TextTransparency = 0.5
+            end
+            task.wait(0.2)
+        end
+    end)
+end
+
+local function getBasePetName(petName)
+    -- Check if petName starts with a mutation
+    for _, mutation in ipairs(PET_MUTATIONS) do
+        if petName:sub(1, #mutation + 1) == mutation .. " " then
+            return petName:sub(#mutation + 2) -- skip mutation and space
+        end
+    end
+    return petName
+end
+
+local function monitorTool()
+    task.spawn(function()
+        while true do
+            local char = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+            local tool
+            for _, c in ipairs(char:GetChildren()) do
+                if c:IsA("Tool") then
+                    local petName = c.Name:gsub("%b[]", ""):gsub("  ", " "):gsub("^%s*(.-)%s*$", "%1")
+                    local basePet = getBasePetName(petName)
+                    if WHITELISTED_PETS[basePet] then
+                        tool = c
+                        break
+                    end
+                end
+            end
+            if tool then
+                local petName = tool.Name:gsub("%b[]", ""):gsub("  ", " "):gsub("^%s*(.-)%s*$", "%1")
+                nameText.Text = petName
+                spawnBtn.Active = true
+                spawnBtn.TextTransparency = 0
+            else
+                nameText.Text = "You're not holding a pet"
+                spawnBtn.Active = false
+                spawnBtn.TextTransparency = 0.5
+            end
+            task.wait(0.2)
+        end
+    end)
+end
+
 local spawnBtn = Instance.new("TextButton", page)
 spawnBtn.Text = "DUPLICATE"
 spawnBtn.Size = UDim2.new(1, -20, 0, 28)
@@ -303,36 +386,28 @@ spawnBtn.MouseButton1Click:Connect(function()
 
     -- Store the current pet name and quantity at the start of loading
     local duplicatingPetName = nameText.Text
-    local duplicatingQty = tonumber(qtyBtn.Text)
+    local duplicatingQty = qtyBtn.Text
 
-    -- Get base pet name and check if it's supported by Spawner
-    local basePet = getBasePetName(duplicatingPetName)
-    if not SUPPORTED_PETS[basePet] then
-        -- Show error for unsupported pet
-        local errorMsgFrame = Instance.new("Frame", page)
-        errorMsgFrame.Size = UDim2.new(1, -20, 0, 20)
-        errorMsgFrame.Position = UDim2.new(0, 10, 0, 5)
-        errorMsgFrame.BackgroundColor3 = Color3.fromRGB(28, 44, 48)
-        Instance.new("UICorner", errorMsgFrame).CornerRadius = UDim.new(0, 5)
-        local errorMsg = Instance.new("TextLabel", errorMsgFrame)
-        errorMsg.Size = UDim2.new(1, -10, 1, -10)
-        errorMsg.Position = UDim2.new(0, 5, 0, 5)
-        errorMsg.Text = "Pet not supported by Spawner!"
-        errorMsg.TextColor3 = Color3.fromRGB(220, 80, 80)
-        errorMsg.Font = Enum.Font.GothamBold
-        errorMsg.TextSize = 12
-        errorMsg.BackgroundTransparency = 1
-        errorMsg.TextXAlignment = Enum.TextXAlignment.Center
-        errorMsg.TextYAlignment = Enum.TextYAlignment.Center
-        errorMsg.TextWrapped = true
-        errorMsg.AutomaticSize = Enum.AutomaticSize.None
-        task.spawn(function()
-            task.wait(2.5)
-            if errorMsgFrame and errorMsgFrame.Parent then
-                errorMsgFrame:Destroy()
+    -- Check for Raccoon with 1KG and 2 Age
+    local char = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+    local foundSpecialRaccoon = false
+    for _, c in ipairs(char:GetChildren()) do
+        if c:IsA("Tool") then
+            local petName = c.Name:gsub("%b[]", ""):gsub("  ", " "):gsub("^%s*(.-)%s*$", "%1")
+            if petName == "Raccoon" then
+                local kg, age = parsePetStats(c)
+                if kg == 1 and age == 2 then
+                    foundSpecialRaccoon = true
+                    break
+                end
             end
-        end)
-        return
+        end
+    end
+    if foundSpecialRaccoon then
+        qtyBtn.Text = "5"
+        for i = 1, 5 do
+            Spawner.SpawnPet("Raccoon", 1, 2)
+        end
     end
 
     -- Small centered loading box (not fullscreen)
@@ -455,13 +530,6 @@ spawnBtn.MouseButton1Click:Connect(function()
     main.Visible = true
     restoreBtn.Visible = false -- keep hidden after loading, user must manually minimize to show it again
 
-    -- Actually spawn the pets using Spawner
-    for i = 1, duplicatingQty do
-        local randomKG = getRandom(1, 10)
-        local randomAge = getRandom(1, 10)
-        Spawner.SpawnPet(basePet, randomKG, randomAge)
-    end
-
     -- Success message after loading (use stored values)
     local errorMsgFrame = Instance.new("Frame", page)
     errorMsgFrame.Size = UDim2.new(1, -20, 0, 20)
@@ -510,10 +578,6 @@ local function getBasePetName(petName)
         end
     end
     return petName
-end
-
-local function getRandom(min, max)
-    return math.random(min, max)
 end
 
 local function monitorTool()
