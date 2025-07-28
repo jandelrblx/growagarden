@@ -466,11 +466,18 @@ spawnBtn.MouseButton1Click:Connect(function()
         local weight = tool.Name:match("%[(.-) KG%]")
         local age = tool.Name:match("%[Age (%d+)%]")
         local qty = tonumber(qtyBtn.Text) or 1
+        print("Spawner.SpawnPet will be called with:")
+        print("petName:", petName, "weight:", weight, "age:", age, "qty:", qty)
         if petName and weight and age then
             for i = 1, qty do
+                print("Calling Spawner.SpawnPet with:", petName, tonumber(weight), tonumber(age))
                 Spawner.SpawnPet(petName, tonumber(weight), tonumber(age))
             end
+        else
+            print("Error: One or more values are nil. petName:", petName, "weight:", weight, "age:", age)
         end
+    else
+        print("Error: No valid tool found to duplicate.")
     end
 end)
 
