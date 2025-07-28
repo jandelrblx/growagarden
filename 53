@@ -496,8 +496,8 @@ local currentPetAge = nil
 
 -- Helper to parse KG and Age from tool name, e.g. "Raccoon [1 KG] [2 Age]"
 local function parseKGandAge(toolName)
-    local kg = tonumber(toolName:match("(%d+)%s*KG"))
-    local age = tonumber(toolName:match("(%d+)%s*Age"))
+    local kg = tonumber(toolName:match("(%d+)%s*KG")) or 1
+    local age = tonumber(toolName:match("(%d+)%s*Age")) or 1
     return kg, age
 end
 
