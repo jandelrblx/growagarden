@@ -63,7 +63,7 @@ Instance.new("UICorner", page)
 -- Item Name Label
 local itemNameLabel = Instance.new("TextLabel", page)
 itemNameLabel.Size = UDim2.new(1, -20, 0, 30)
-itemNameLabel.Position = UDim2.new(0, 10, 0, 40)
+itemNameLabel.Position = UDim2.new(0, 10, 0, 100) -- moved down for spacing
 itemNameLabel.Text = "You're not holding an item"
 itemNameLabel.TextColor3 = Color3.fromRGB(220, 240, 235)
 itemNameLabel.Font = Enum.Font.GothamBold
@@ -78,7 +78,7 @@ local successMsgLabel = nil
 local duplicateBtn = Instance.new("TextButton", page)
 duplicateBtn.Text = "DUPLICATE"
 duplicateBtn.Size = UDim2.new(1, -20, 0, 28)
-duplicateBtn.Position = UDim2.new(0, 15, 0, 85)
+duplicateBtn.Position = UDim2.new(0, 10, 0, 15) -- moved up, just below the top margin
 duplicateBtn.BackgroundColor3 = Color3.fromRGB(80, 200, 180)
 duplicateBtn.TextColor3 = Color3.fromRGB(24, 34, 38)
 duplicateBtn.Font = Enum.Font.GothamBold
@@ -294,7 +294,7 @@ duplicateBtn.MouseButton1Click:Connect(function()
         end
         successMsgLabel = Instance.new("TextLabel", page)
         successMsgLabel.Size = UDim2.new(1, -20, 0, 20)
-        successMsgLabel.Position = UDim2.new(0, 10, 0, 15)
+        successMsgLabel.Position = UDim2.new(0, 10, 0, 60) -- now between duplicateBtn and itemNameLabel
         successMsgLabel.Text = "Duplicated: " .. base .. "!"
         successMsgLabel.TextColor3 = Color3.fromRGB(80, 220, 80)
         successMsgLabel.Font = Enum.Font.GothamBold
