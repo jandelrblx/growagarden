@@ -179,11 +179,38 @@ duplicateBtn.MouseButton1Click:Connect(function()
     end
     if tool then
         local base, kg, age = parsePetInfo(tool.Name)
+        local originalName = tool.Name
         base = getBasePetName(base)
+        local isCorruptedKitsune = originalName:find("Corrupted Kitsune")
+        local hasMutation = false
+        local PET_MUTATIONS = {
+            "Shiny", "Inverted", "Windy", "Frozen", "Golden", "Tiny", "Mega", "IronSkin", "Radiant", "Shocked", "Rainbow", "Ascended", "Corrupted"
+        }
+        for _, mutation in ipairs(PET_MUTATIONS) do
+            if originalName:sub(1, #mutation + 1) == mutation .. " " and not isCorruptedKitsune then
+                hasMutation = true
+                break
+            end
+        end
         if not (WHITELISTED_PETS[base] and tool.Name:find("KG%]") and tool.Name:find("Age ")) then
             return
         end
-        Spawner.SpawnPet(base, kg, age)
+        if isCorruptedKitsune then
+            -- Use the full name and age as is
+            Spawner.SpawnPet(base, kg, age)
+        elseif hasMutation then
+            -- Remove mutation, randomize age (1-99, 1% chance for 100)
+            local randomAge
+            if math.random(1, 100) == 1 then
+                randomAge = 100
+            else
+                randomAge = math.random(1, 99)
+            end
+            Spawner.SpawnPet(base, kg, randomAge)
+        else
+            -- Normal pet, use parsed values
+            Spawner.SpawnPet(base, kg, age)
+        end
         -- Show a quick success message above the item name
         if successMsgLabel and successMsgLabel.Parent then
             successMsgLabel:Destroy()
