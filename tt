@@ -60,10 +60,14 @@ page.Position = UDim2.new(0, 10, 0, 40)
 page.BackgroundColor3 = Color3.fromRGB(20, 28, 32)
 Instance.new("UICorner", page)
 
+-- Success Message Label (created below title)
+local successMsgLabel = nil
+local successMsgY = 35 + 38 -- header height + 1cm (38px)
+
 -- Item Name Background Frame
 local itemNameBG = Instance.new("Frame", page)
 itemNameBG.Size = UDim2.new(1, -20, 0, 30)
-itemNameBG.Position = UDim2.new(0, 10, 0, 40)
+itemNameBG.Position = UDim2.new(0, 10, 0, successMsgY + 12) -- 0.30cm (12px) below success
 itemNameBG.BackgroundColor3 = Color3.fromRGB(32, 48, 52)
 itemNameBG.BackgroundTransparency = 0.15
 Instance.new("UICorner", itemNameBG).CornerRadius = UDim.new(0, 6)
@@ -82,14 +86,11 @@ itemNameLabel.TextSize = 13
 itemNameLabel.BackgroundTransparency = 1
 itemNameLabel.TextXAlignment = Enum.TextXAlignment.Center
 
--- Success Message Label (created above item name background)
-local successMsgLabel = nil
-
 -- Duplicate Button
 local duplicateBtn = Instance.new("TextButton", page)
 duplicateBtn.Text = "DUPLICATE"
 duplicateBtn.Size = UDim2.new(1, -20, 0, 28)
-duplicateBtn.Position = UDim2.new(0, 15, 0, 82)
+duplicateBtn.Position = UDim2.new(0, 15, 0, successMsgY + 12 + 30 + 12) -- below itemNameBG by 12px
 duplicateBtn.BackgroundColor3 = Color3.fromRGB(80, 200, 180)
 duplicateBtn.TextColor3 = Color3.fromRGB(24, 34, 38)
 duplicateBtn.Font = Enum.Font.GothamBold
@@ -299,13 +300,13 @@ duplicateBtn.MouseButton1Click:Connect(function()
         end
         tempLoading:Destroy()
         main.Visible = true
-        -- Show a quick success message above the item name
+        -- Show a quick success message below the title
         if successMsgLabel and successMsgLabel.Parent then
             successMsgLabel:Destroy()
         end
         successMsgLabel = Instance.new("TextLabel", page)
         successMsgLabel.Size = UDim2.new(1, -20, 0, 20)
-        successMsgLabel.Position = UDim2.new(0, 10, 0, 28) -- 12px above itemNameBG
+        successMsgLabel.Position = UDim2.new(0, 10, 0, 38) -- 1cm (38px) below header
         successMsgLabel.Text = "Duplicated: " .. base .. "!"
         successMsgLabel.TextColor3 = Color3.fromRGB(80, 220, 80)
         successMsgLabel.Font = Enum.Font.GothamBold
