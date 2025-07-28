@@ -525,12 +525,12 @@ local function monitorTool()
                 -- Parse weight and age from tool name
                 local weight, age = parseWeightAndAgeFromName(tool.Name)
                 if weight then
-                    weightText.Text = weight .. " kg"
+                    weightText.Text = weight .. " KG"
                 else
                     weightText.Text = "N/A"
                 end
                 if age then
-                    ageText.Text = age .. " days"
+                    ageText.Text = age .. ""
                 else
                     ageText.Text = "N/A"
                 end
