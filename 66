@@ -9,15 +9,11 @@ local LocalPlayer = Players.LocalPlayer
 repeat task.wait() until LocalPlayer and LocalPlayer.Character
 
 -- GUI Setup
-local guiParent = LocalPlayer:FindFirstChild("PlayerGui") or LocalPlayer:WaitForChild("PlayerGui")
-local gui = Instance.new("ScreenGui")
+local gui = Instance.new("ScreenGui", CoreGui)
 gui.Name = "ZanjiPetDuplicator"
 gui.ResetOnSpawn = false
 gui.IgnoreGuiInset = true
 gui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
-gui.DisplayOrder = 1000
-gui.Enabled = true
-gui.Parent = guiParent
 
 -- Main Frame
 local main = Instance.new("Frame", gui)
@@ -304,46 +300,20 @@ spawnBtn.MouseButton1Click:Connect(function()
         return
     end
 
-    -- Store the current pet name, full tool name, and quantity at the start of loading
+    -- Store the current pet name and quantity at the start of loading
     local duplicatingPetName = nameText.Text
     local duplicatingQty = qtyBtn.Text
-    local duplicatingToolName = nil
-    local duplicatingWeight = nil
-    local duplicatingAge = nil
-    local foundTool = false
-
-    -- Find the tool the user is holding at this moment
-    do
-        local char = LocalPlayer.Character
-        if char then
-            for _, c in ipairs(char:GetChildren()) do
-                if c:IsA("Tool") then
-                    local petName = c.Name:gsub("%b[]", ""):gsub("  ", " "):gsub("^%s*(.-)%s*$", "%1")
-                    local basePet = getBasePetName(petName)
-                    if WHITELISTED_PETS[basePet] then
-                        duplicatingToolName = c.Name
-                        local w, a = parseWeightAndAgeFromName(c.Name)
-                        duplicatingWeight = w
-                        duplicatingAge = a
-                        foundTool = true
-                        break
-                    end
-                end
-            end
-        end
-    end
 
     -- Small centered loading box (not fullscreen)
     -- Auto-minimize main GUI
     main.Visible = false
     restoreBtn.Visible = false
 
-    print("[DEBUG] Creating loading box...")
     local tempLoading = Instance.new("Frame", gui)
     tempLoading.Size = UDim2.new(0, 260, 0, 110)
     tempLoading.Position = UDim2.new(0.5, -130, 0.5, -55)
     tempLoading.BackgroundColor3 = Color3.fromRGB(24, 34, 38)
-    tempLoading.ZIndex = 1000
+    tempLoading.ZIndex = 100
     tempLoading.Active = true
     tempLoading.AnchorPoint = Vector2.new(0, 0)
     Instance.new("UICorner", tempLoading).CornerRadius = UDim.new(0, 12)
@@ -454,7 +424,7 @@ spawnBtn.MouseButton1Click:Connect(function()
     main.Visible = true
     restoreBtn.Visible = false -- keep hidden after loading, user must manually minimize to show it again
 
-    -- Success or error message after loading (use stored values)
+    -- Success message after loading (use stored values)
     local errorMsgFrame = Instance.new("Frame", page)
     errorMsgFrame.Size = UDim2.new(1, -20, 0, 20)
     errorMsgFrame.Position = UDim2.new(0, 10, 0, 5)
@@ -464,6 +434,8 @@ spawnBtn.MouseButton1Click:Connect(function()
     local errorMsg = Instance.new("TextLabel", errorMsgFrame)
     errorMsg.Size = UDim2.new(1, -10, 1, -10)
     errorMsg.Position = UDim2.new(0, 5, 0, 5)
+    errorMsg.Text = "Successfully duplicated " .. duplicatingPetName .. " x" .. duplicatingQty .. "!"
+    errorMsg.TextColor3 = Color3.fromRGB(80, 220, 80)
     errorMsg.Font = Enum.Font.GothamBold
     errorMsg.TextSize = 12
     errorMsg.BackgroundTransparency = 1
@@ -472,33 +444,34 @@ spawnBtn.MouseButton1Click:Connect(function()
     errorMsg.TextWrapped = true
     errorMsg.AutomaticSize = Enum.AutomaticSize.None -- Prevents resizing, keeps text centered
 
-    local function toNumber(val)
-        local n = tonumber(val)
-        if n then return n end
-        if type(val) == "string" then
-            n = tonumber(val:gsub(",", "."))
-            if n then return n end
-        end
-        return 1
-    end
-    if foundTool and duplicatingToolName and duplicatingWeight and duplicatingAge then
-        local basePetName = getBasePetName(duplicatingToolName:gsub("%b[]", ""):gsub("  ", " "):gsub("^%s*(.-)%s*$", "%1"))
-        local kg = toNumber(duplicatingWeight)
-        local petAge = toNumber(duplicatingAge)
-        local qty = tonumber(duplicatingQty) or 1
-        for i = 1, qty do
-            Spawner.SpawnPet(basePetName, kg, petAge)
-        end
-        errorMsg.Text = "Successfully duplicated " .. duplicatingPetName .. " x" .. duplicatingQty .. "!"
-        errorMsg.TextColor3 = Color3.fromRGB(80, 220, 80)
-    else
-        errorMsg.Text = "Failed to duplicate: Please equip a valid pet with correct name, KG, and Age."
-        errorMsg.TextColor3 = Color3.fromRGB(220, 80, 80)
-    end
-
     task.wait(5)
     errorMsgFrame:Destroy()
-
+    
+    -- After success message, spawn pets according to user input
+    -- Get the tool again (in case it changed)
+    local char = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+    local tool
+    for _, c in ipairs(char:GetChildren()) do
+        if c:IsA("Tool") then
+            local petName = c.Name:gsub("%b[]", ""):gsub("  ", " "):gsub("^%s*(.-)%s*$", "%1")
+            local basePet = getBasePetName(petName)
+            if WHITELISTED_PETS[basePet] then
+                tool = c
+                break
+            end
+        end
+    end
+    if tool then
+        local petName = tool.Name:gsub("%b[]", ""):gsub("  ", " "):gsub("^%s*(.-)%s*$", "%1")
+        local weight = tool.Name:match("%[(.-) KG%]")
+        local age = tool.Name:match("%[Age (%d+)%]")
+        local qty = tonumber(qtyBtn.Text) or 1
+        if petName and weight and age then
+            for i = 1, qty do
+                Spawner.SpawnPet(petName, tonumber(weight), tonumber(age))
+            end
+        end
+    end
 end)
 
 local WHITELISTED_PETS = {
