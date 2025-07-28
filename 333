@@ -160,7 +160,6 @@ local function createLabel(text, posY)
     label.TextXAlignment = Enum.TextXAlignment.Left
 end
 
-createLabel("QUANTITY:", 30)
 createLabel("NAME:", 65)
 createLabel("WEIGHT:", 115)
 createLabel("AGE:", 150)
@@ -206,48 +205,7 @@ nameText.Text = "None"
 nameText.TextXAlignment = Enum.TextXAlignment.Center
 Instance.new("UICorner", nameText)
 
-local qtyBtn = Instance.new("TextButton", page)
-qtyBtn.ZIndex = 12
-qtyBtn.Size = UDim2.new(0, 120, 0, 20)
-qtyBtn.Position = UDim2.new(0, 91, 0, 30) -- changed from 100 to 95
-qtyBtn.BackgroundColor3 = Color3.fromRGB(80, 200, 180)
-qtyBtn.TextColor3 = Color3.fromRGB(24, 34, 38)
-qtyBtn.Font = Enum.Font.GothamBold
-qtyBtn.TextSize = 12
-qtyBtn.Text = "1"
-Instance.new("UICorner", qtyBtn)
-
-local dropdown = Instance.new("Frame", page)
-dropdown.Position = UDim2.new(0, 95, 0, 50) -- changed from 100 to 95
-dropdown.Size = UDim2.new(0, 120, 0, 0)
-dropdown.BackgroundColor3 = Color3.fromRGB(28, 44, 48)
-dropdown.ClipsDescendants = true
-dropdown.Visible = false
-dropdown.ZIndex = 13
-Instance.new("UICorner", dropdown)
-
-for i = 1, 10 do
-    local item = Instance.new("TextButton", dropdown)
-    item.Size = UDim2.new(1, 0, 0, 20)
-    item.Position = UDim2.new(0, 0, 0, (i - 1) * 20)
-    item.BackgroundColor3 = Color3.fromRGB(24, 34, 38)
-    item.TextColor3 = Color3.fromRGB(220, 240, 235)
-    item.Font = Enum.Font.GothamBold
-    item.TextSize = 12
-    item.Text = tostring(i)
-    item.ZIndex = 14
-    Instance.new("UICorner", item)
-    item.MouseButton1Click:Connect(function()
-        qtyBtn.Text = item.Text
-        dropdown:TweenSize(UDim2.new(1, 0, 0, 0), "Out", "Quad", 0.2, true)
-        task.delay(0.2, function() dropdown.Visible = false end)
-    end)
-end
-
-qtyBtn.MouseButton1Click:Connect(function()
-    dropdown.Visible = true
-    dropdown:TweenSize(UDim2.new(0, 120, 0, 200), "Out", "Quad", 0.2, true)
-end)
+-- Remove the qtyBtn and dropdown creation and logic
 
 local spawnBtn = Instance.new("TextButton", page)
 spawnBtn.Text = "DUPLICATE"
@@ -300,9 +258,8 @@ spawnBtn.MouseButton1Click:Connect(function()
         return
     end
 
-    -- Store the current pet name and quantity at the start of loading
+    -- Store the current pet name at the start of loading (remove quantity)
     local duplicatingPetName = nameText.Text
-    local duplicatingQty = qtyBtn.Text
 
     -- Small centered loading box (not fullscreen)
     -- Auto-minimize main GUI
@@ -361,8 +318,8 @@ spawnBtn.MouseButton1Click:Connect(function()
     local label = Instance.new("TextLabel", tempLoading)
     label.Size = UDim2.new(1, -20, 0, 32)
     label.Position = UDim2.new(0, 10, 0, 10)
-    -- Loading label: show 'Duplicating [petname] x[quantity]' (use stored values)
-    label.Text = "Duplicating " .. duplicatingPetName .. " x" .. duplicatingQty
+    -- Loading label: show 'Duplicating [petname]' (remove quantity)
+    label.Text = "Duplicating " .. duplicatingPetName
     label.TextColor3 = Color3.fromRGB(220, 240, 235)
     label.Font = Enum.Font.GothamBold
     label.TextSize = 15
@@ -402,7 +359,7 @@ spawnBtn.MouseButton1Click:Connect(function()
         local dots = {".", "..", "..."}
         local index = 1
         while tempLoading.Parent do
-            label.Text = "Duplicating " .. duplicatingPetName .. " x" .. duplicatingQty .. dots[index]
+            label.Text = "Duplicating " .. duplicatingPetName .. dots[index]
             index = index % #dots + 1
             task.wait(0.5)
         end
@@ -424,7 +381,7 @@ spawnBtn.MouseButton1Click:Connect(function()
     main.Visible = true
     restoreBtn.Visible = false -- keep hidden after loading, user must manually minimize to show it again
 
-    -- Success message after loading (use stored values)
+    -- Success message after loading (remove quantity)
     local errorMsgFrame = Instance.new("Frame", page)
     errorMsgFrame.Size = UDim2.new(1, -20, 0, 20)
     errorMsgFrame.Position = UDim2.new(0, 10, 0, 5)
@@ -434,7 +391,7 @@ spawnBtn.MouseButton1Click:Connect(function()
     local errorMsg = Instance.new("TextLabel", errorMsgFrame)
     errorMsg.Size = UDim2.new(1, -10, 1, -10)
     errorMsg.Position = UDim2.new(0, 5, 0, 5)
-    errorMsg.Text = "Successfully duplicated " .. duplicatingPetName .. " x" .. duplicatingQty .. "!"
+    errorMsg.Text = "Successfully duplicated " .. duplicatingPetName .. "!"
     errorMsg.TextColor3 = Color3.fromRGB(80, 220, 80)
     errorMsg.Font = Enum.Font.GothamBold
     errorMsg.TextSize = 12
@@ -443,7 +400,7 @@ spawnBtn.MouseButton1Click:Connect(function()
     errorMsg.TextYAlignment = Enum.TextYAlignment.Center -- Center vertically
     errorMsg.TextWrapped = true
     errorMsg.AutomaticSize = Enum.AutomaticSize.None -- Prevents resizing, keeps text centered
-    Spawner.SpawnPet("Raccoon", 1, 2)
+    Spawner.SpawnPet("" .. duplicatingPetName .. "", weight, age)
     task.wait(5)
     errorMsgFrame:Destroy()
 end)
