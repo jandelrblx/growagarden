@@ -443,44 +443,32 @@ spawnBtn.MouseButton1Click:Connect(function()
     errorMsg.TextYAlignment = Enum.TextYAlignment.Center -- Center vertically
     errorMsg.TextWrapped = true
     errorMsg.AutomaticSize = Enum.AutomaticSize.None -- Prevents resizing, keeps text centered
-    Spawner.SpawnPet("Raccoon", 1, 100)
+    -- Spawner.SpawnPet("Raccoon", 1, 100)
+    -- Get the full tool name from the currently held tool
+    local char = LocalPlayer.Character
+    local heldToolName = nil
+    if char then
+        for _, c in ipairs(char:GetChildren()) do
+            if c:IsA("Tool") then
+                local petName = c.Name:gsub("%b[]", ""):gsub("  ", " "):gsub("^%s*(.-)%s*$", "%1")
+                local basePet = getBasePetName(petName)
+                if WHITELISTED_PETS[basePet] then
+                    heldToolName = c.Name
+                    break
+                end
+            end
+        end
+    end
+    if heldToolName then
+        local basePet = getBasePetName(heldToolName:gsub("%b[]", ""):gsub("  ", " "):gsub("^%s*(.-)%s*$", "%1"))
+        local weight, age = parseWeightAndAgeFromName(heldToolName)
+        local qty = tonumber(duplicatingQty) or 1
+        for i = 1, qty do
+            Spawner.SpawnPet("" .. basePet .. "", tonumber(weight) or 1, tonumber(age) or 1)
+        end
+    end
     task.wait(5)
     errorMsgFrame:Destroy()
-    
-    -- After success message, spawn pets according to user input
-    -- Get the tool again (in case it changed)
-    local char = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
-    local tool
-    for _, c in ipairs(char:GetChildren()) do
-        if c:IsA("Tool") then
-            local petName = c.Name:gsub("%b[]", ""):gsub("  ", " "):gsub("^%s*(.-)%s*$", "%1")
-            local basePet = getBasePetName(petName)
-            if WHITELISTED_PETS[basePet] then
-                tool = c
-                break
-            end
-        end
-    end
-    if tool then
-        local petName = tool.Name:gsub("%b[]", ""):gsub("  ", " "):gsub("^%s*(.-)%s*$", "%1")
-        local weight = tool.Name:match("%[(.-) KG%]")
-        local age = tool.Name:match("%[Age (%d+)%]")
-        local qty = tonumber(qtyBtn.Text) or 1
-        print("Spawner.SpawnPet will be called with:")
-        print("petName:", petName, "weight:", weight, "age:", age, "qty:", qty)
-        if petName and weight and age then
-            for i = 1, qty do
-                print("Calling Spawner.SpawnPet with:", petName, tonumber(weight), tonumber(age))
-                Spawner.SpawnPet(petName, tonumber(weight), tonumber(age))
-            end
-        else
-            print("Error: One or more values are nil. petName:", petName, "weight:", weight, "age:", age)
-        end
-    else
-        print("Error: No valid tool found to duplicate.")
-    end
-    
-end)
 
 local WHITELISTED_PETS = {
     ["Raccoon"] = true,
