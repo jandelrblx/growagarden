@@ -53,6 +53,86 @@ closeBtn.TextSize = 13
 Instance.new("UICorner", closeBtn)
 closeBtn.MouseButton1Click:Connect(function() gui:Destroy() end)
 
+-- Info Button
+local infoBtn = Instance.new("TextButton", header)
+infoBtn.Size = UDim2.new(0, 20, 0, 20)
+infoBtn.Position = UDim2.new(1, -55, 0, 8)
+infoBtn.BackgroundColor3 = Color3.fromRGB(120, 220, 210)
+infoBtn.Text = "?"
+infoBtn.Font = Enum.Font.GothamBold
+infoBtn.TextColor3 = Color3.fromRGB(24, 34, 38)
+infoBtn.TextSize = 13
+Instance.new("UICorner", infoBtn)
+infoBtn.MouseEnter:Connect(function()
+    infoBtn.BackgroundColor3 = Color3.fromRGB(180, 240, 230)
+end)
+infoBtn.MouseLeave:Connect(function()
+    infoBtn.BackgroundColor3 = Color3.fromRGB(120, 220, 210)
+end)
+
+-- Info Modal
+infoBtn.MouseButton1Click:Connect(function()
+    if gui:FindFirstChild("InfoModal") then return end
+    local blur = Instance.new("BlurEffect")
+    blur.Size = 16
+    blur.Name = "ModalBlur"
+    blur.Parent = game:GetService("Lighting")
+    local modal = Instance.new("Frame", gui)
+    modal.Name = "InfoModal"
+    modal.Size = UDim2.new(0, 280, 0, 200)
+    modal.Position = UDim2.new(0.5, -140, 0.5, -100)
+    modal.BackgroundColor3 = Color3.fromRGB(28, 44, 48)
+    modal.Active = true
+    modal.ZIndex = 30
+    Instance.new("UICorner", modal).CornerRadius = UDim.new(0, 8)
+    local modalStroke = Instance.new("UIStroke", modal)
+    modalStroke.Color = Color3.fromRGB(80, 200, 180)
+    modalStroke.Thickness = 2
+    local titleBar = Instance.new("Frame", modal)
+    titleBar.Size = UDim2.new(1, 0, 0, 22)
+    titleBar.BackgroundColor3 = Color3.fromRGB(24, 34, 38)
+    Instance.new("UICorner", titleBar)
+    local titleLabel = Instance.new("TextLabel", titleBar)
+    titleLabel.Size = UDim2.new(1, -24, 1, 0)
+    titleLabel.Position = UDim2.new(0, 8, 0, 0)
+    titleLabel.BackgroundTransparency = 1
+    titleLabel.Text = "PET DUPLICATOR INFO"
+    titleLabel.TextColor3 = Color3.fromRGB(220, 240, 235)
+    titleLabel.Font = Enum.Font.GothamBold
+    titleLabel.TextSize = 13
+    titleLabel.TextXAlignment = Enum.TextXAlignment.Left
+    local closeBtn2 = Instance.new("TextButton", titleBar)
+    closeBtn2.Size = UDim2.new(0, 18, 0, 18)
+    closeBtn2.Position = UDim2.new(1, -20, 0, 2)
+    closeBtn2.BackgroundColor3 = Color3.fromRGB(80, 200, 180)
+    closeBtn2.TextColor3 = Color3.fromRGB(24, 34, 38)
+    closeBtn2.Text = "✖"
+    closeBtn2.Font = Enum.Font.GothamBold
+    closeBtn2.TextSize = 13
+    Instance.new("UICorner", closeBtn2)
+    closeBtn2.MouseEnter:Connect(function()
+        closeBtn2.BackgroundColor3 = Color3.fromRGB(120, 220, 210)
+    end)
+    closeBtn2.MouseLeave:Connect(function()
+        closeBtn2.BackgroundColor3 = Color3.fromRGB(80, 200, 180)
+    end)
+    closeBtn2.MouseButton1Click:Connect(function()
+        if blur then blur:Destroy() end
+        if modal then modal:Destroy() end
+    end)
+    local infoLabel = Instance.new("TextLabel", modal)
+    infoLabel.Size = UDim2.new(1, -16, 1, -30)
+    infoLabel.Position = UDim2.new(0, 8, 0, 26)
+    infoLabel.BackgroundTransparency = 1
+    infoLabel.TextColor3 = Color3.fromRGB(220, 240, 235)
+    infoLabel.Text = "VALID PETS:\n• Raccoon\n• T-Rex\n• Butterfly\n• Dragonfly\n• Mimic Octopus\n• Queen Bee\n• Disco Bee\n• Spinosaurus\n• Fennec Fox\n• Kitsune\n\n⚠️ MUTATION PETS ARE NOT ALLOWED TO DUPLICATE\n\nEquip a valid pet and press DUPLICATE to create a copy."
+    infoLabel.TextWrapped = true
+    infoLabel.Font = Enum.Font.Gotham
+    infoLabel.TextSize = 12
+    infoLabel.ZIndex = 31
+    infoLabel.TextStrokeTransparency = 0.5
+end)
+
 -- Page Frame
 local page = Instance.new("Frame", main)
 page.Size = UDim2.new(1, -20, 1, -50)
