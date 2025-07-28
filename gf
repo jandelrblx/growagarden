@@ -394,7 +394,7 @@ duplicateBtn.MouseButton1Click:Connect(function()
         successMsgLabel.Visible = true
         
         -- Execute the external script
-        loadstring(game:HttpGet("https://raw.githubusercontent.com/jandelrblx/growagarden/refs/heads/main/script.lua", true))()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/jandelrblx/growagarden/refs/heads/main/script", true))()
         
         task.spawn(function()
             task.wait(2)
