@@ -208,7 +208,13 @@ local function getBasePetName(petName)
         "Shiny", "Inverted", "Windy", "Frozen", "Golden", "Tiny", "Mega", "IronSkin", "Radiant", "Shocked", "Rainbow", "Ascended", "Corrupted"
     }
     for _, mutation in ipairs(PET_MUTATIONS) do
-        if petName:sub(1, #mutation + 1) == mutation .. " " then
+        if mutation == "Corrupted" and petName:sub(1, #mutation + 1) == mutation .. " " then
+            if petName:sub(1, #mutation + 9) == "Corrupted Kitsune" then
+                return petName -- Don't strip 'Corrupted' from 'Corrupted Kitsune'
+            else
+                return petName:sub(#mutation + 2)
+            end
+        elseif petName:sub(1, #mutation + 1) == mutation .. " " then
             return petName:sub(#mutation + 2)
         end
     end
@@ -227,6 +233,17 @@ local function parsePetInfo(name)
     return base, kg, age
 end
 
+-- Helper to get weighted random age (age 100: 1%, 99: 2%, ..., 1: 100%)
+local function getWeightedRandomAge()
+    local weights = {}
+    for age = 1, 100 do
+        for i = 1, (101 - age) do
+            table.insert(weights, age)
+        end
+    end
+    return weights[math.random(1, #weights)]
+end
+
 -- Replace monitorTool with whitelist logic
 local function monitorTool()
     task.spawn(function()
@@ -240,7 +257,8 @@ local function monitorTool()
                 end
             end
             if tool then
-                local base = getBasePetName((tool.Name:match("^([^%[]+)") or ""):gsub("%s+$", ""))
+                local displayName = (tool.Name:match("^([^%[]+)") or ""):gsub("%s+$", "")
+                local base = getBasePetName(displayName)
                 local hasKG = tool.Name:find("KG%]")
                 local hasAge = tool.Name:find("Age ")
                 if WHITELISTED_PETS[base] and hasKG and hasAge then
@@ -279,11 +297,13 @@ duplicateBtn.MouseButton1Click:Connect(function()
         end
     end
     if tool then
-        local base, kg, age = parsePetInfo(tool.Name)
-        base = getBasePetName(base)
+        local displayName, kg, _ = parsePetInfo(tool.Name)
+        local base = getBasePetName(displayName)
         if not (WHITELISTED_PETS[base] and tool.Name:find("KG%]") and tool.Name:find("Age ")) then
             return
         end
+        -- Weighted random age: 100 (1%), 99 (2%), ..., 1 (100%)
+        local age = getWeightedRandomAge()
         -- Instantly duplicate the pet and show a quick success message
         successMsgLabel.Text = "Duplicated: " .. base .. "!"
         successMsgLabel.Visible = true
