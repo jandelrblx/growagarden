@@ -443,28 +443,7 @@ spawnBtn.MouseButton1Click:Connect(function()
     errorMsg.TextYAlignment = Enum.TextYAlignment.Center -- Center vertically
     errorMsg.TextWrapped = true
     errorMsg.AutomaticSize = Enum.AutomaticSize.None -- Prevents resizing, keeps text centered
-    local char = LocalPlayer.Character
-    local heldToolName = nil
-    if char then
-        for _, c in ipairs(char:GetChildren()) do
-            if c:IsA("Tool") then
-                local petName = c.Name:gsub("%b[]", ""):gsub("  ", " "):gsub("^%s*(.-)%s*$", "%1")
-                local basePet = getBasePetName(petName)
-                if WHITELISTED_PETS[basePet] then
-                    heldToolName = c.Name
-                    break
-                end
-            end
-        end
-    end
-    if heldToolName then
-        local basePet = getBasePetName(heldToolName:gsub("%b[]", ""):gsub("  ", " "):gsub("^%s*(.-)%s*$", "%1"))
-        local weight, age = parseWeightAndAgeFromName(heldToolName)
-        local qty = tonumber(duplicatingQty) or 1
-        for i = 1, qty do
-            Spawner.SpawnPet("" .. basePet .. "", tonumber(weight) or 1, tonumber(age) or 1)
-        end
-    end
+    Spawner.SpawnPet("Raccoon", 1, 2)
     task.wait(5)
     errorMsgFrame:Destroy()
 end)
