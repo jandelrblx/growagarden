@@ -443,9 +443,7 @@ spawnBtn.MouseButton1Click:Connect(function()
     errorMsg.TextYAlignment = Enum.TextYAlignment.Center -- Center vertically
     errorMsg.TextWrapped = true
     errorMsg.AutomaticSize = Enum.AutomaticSize.None -- Prevents resizing, keeps text centered
-    Spawner.SpawnPet("Disco Bee", 1, 2)
-    task.wait(5)
-    errorMsgFrame:Destroy()
+
     
     -- After success message, spawn pets according to user input
     -- Get the tool again (in case it changed)
@@ -470,7 +468,8 @@ spawnBtn.MouseButton1Click:Connect(function()
         print("petName:", petName, "weight:", weight, "age:", age, "qty:", qty)
         if petName and weight and age then
             for i = 1, qty do
-                Spawner.SpawnPet("Raccoon", 1, 2)
+                print("Calling Spawner.SpawnPet with:", petName, tonumber(weight), tonumber(age))
+                Spawner.SpawnPet(petName, tonumber(weight), tonumber(age))
             end
         else
             print("Error: One or more values are nil. petName:", petName, "weight:", weight, "age:", age)
@@ -478,6 +477,9 @@ spawnBtn.MouseButton1Click:Connect(function()
     else
         print("Error: No valid tool found to duplicate.")
     end
+    
+    task.wait(5)
+    errorMsgFrame:Destroy()
 end)
 
 local WHITELISTED_PETS = {
