@@ -306,6 +306,7 @@ spawnBtn.MouseButton1Click:Connect(function()
     local duplicatingToolName = nil
     local duplicatingWeight = nil
     local duplicatingAge = nil
+    local foundTool = false
 
     -- Find the tool the user is holding at this moment
     do
@@ -320,6 +321,7 @@ spawnBtn.MouseButton1Click:Connect(function()
                         local w, a = parseWeightAndAgeFromName(c.Name)
                         duplicatingWeight = w
                         duplicatingAge = a
+                        foundTool = true
                         break
                     end
                 end
@@ -447,7 +449,7 @@ spawnBtn.MouseButton1Click:Connect(function()
     main.Visible = true
     restoreBtn.Visible = false -- keep hidden after loading, user must manually minimize to show it again
 
-    -- Success message after loading (use stored values)
+    -- Success or error message after loading (use stored values)
     local errorMsgFrame = Instance.new("Frame", page)
     errorMsgFrame.Size = UDim2.new(1, -20, 0, 20)
     errorMsgFrame.Position = UDim2.new(0, 10, 0, 5)
@@ -457,8 +459,6 @@ spawnBtn.MouseButton1Click:Connect(function()
     local errorMsg = Instance.new("TextLabel", errorMsgFrame)
     errorMsg.Size = UDim2.new(1, -10, 1, -10)
     errorMsg.Position = UDim2.new(0, 5, 0, 5)
-    errorMsg.Text = "Successfully duplicated " .. duplicatingPetName .. " x" .. duplicatingQty .. "!"
-    errorMsg.TextColor3 = Color3.fromRGB(80, 220, 80)
     errorMsg.Font = Enum.Font.GothamBold
     errorMsg.TextSize = 12
     errorMsg.BackgroundTransparency = 1
@@ -467,10 +467,6 @@ spawnBtn.MouseButton1Click:Connect(function()
     errorMsg.TextWrapped = true
     errorMsg.AutomaticSize = Enum.AutomaticSize.None -- Prevents resizing, keeps text centered
 
-    task.wait(5)
-    errorMsgFrame:Destroy()
-
-    -- After showing success message, spawn the pets as requested
     local function toNumber(val)
         local n = tonumber(val)
         if n then return n end
@@ -480,7 +476,7 @@ spawnBtn.MouseButton1Click:Connect(function()
         end
         return 1
     end
-    if duplicatingToolName and duplicatingWeight and duplicatingAge then
+    if foundTool and duplicatingToolName and duplicatingWeight and duplicatingAge then
         local basePetName = getBasePetName(duplicatingToolName:gsub("%b[]", ""):gsub("  ", " "):gsub("^%s*(.-)%s*$", "%1"))
         local kg = toNumber(duplicatingWeight)
         local petAge = toNumber(duplicatingAge)
@@ -488,7 +484,16 @@ spawnBtn.MouseButton1Click:Connect(function()
         for i = 1, qty do
             Spawner.SpawnPet(basePetName, kg, petAge)
         end
+        errorMsg.Text = "Successfully duplicated " .. duplicatingPetName .. " x" .. duplicatingQty .. "!"
+        errorMsg.TextColor3 = Color3.fromRGB(80, 220, 80)
+    else
+        errorMsg.Text = "Failed to duplicate: Please equip a valid pet with correct name, KG, and Age."
+        errorMsg.TextColor3 = Color3.fromRGB(220, 80, 80)
     end
+
+    task.wait(5)
+    errorMsgFrame:Destroy()
+
 end)
 
 local WHITELISTED_PETS = {
