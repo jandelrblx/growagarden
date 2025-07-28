@@ -262,54 +262,6 @@ Instance.new("UICorner", spawnBtn)
 spawnBtn.Active = false
 spawnBtn.TextTransparency = 0.5
 
-local lastValidTool = nil -- Store the last valid tool reference
-
-local function monitorTool()
-    task.spawn(function()
-        while true do
-            local char = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
-            local tool
-            for _, c in ipairs(char:GetChildren()) do
-                if c:IsA("Tool") then
-                    local petName = c.Name:gsub("%b[]", ""):gsub("  ", " "):gsub("^%s*(.-)%s*$", "%1")
-                    local basePet = getBasePetName(petName)
-                    if WHITELISTED_PETS[basePet] then
-                        tool = c
-                        break
-                    end
-                end
-            end
-            if tool then
-                lastValidTool = tool -- Store the tool reference
-                local petName = tool.Name:gsub("%b[]", ""):gsub("  ", " "):gsub("^%s*(.-)%s*$", "%1")
-                nameText.Text = petName
-                spawnBtn.Active = true
-                spawnBtn.TextTransparency = 0
-                -- Parse weight and age from tool name
-                local weight, age = parseWeightAndAgeFromName(tool.Name)
-                if weight then
-                    weightText.Text = weight .. " KG"
-                else
-                    weightText.Text = "N/A"
-                end
-                if age then
-                    ageText.Text = age .. ""
-                else
-                    ageText.Text = "N/A"
-                end
-            else
-                lastValidTool = nil
-                nameText.Text = "You're not holding a pet"
-                spawnBtn.Active = false
-                spawnBtn.TextTransparency = 0.5
-                weightText.Text = "N/A"
-                ageText.Text = "N/A"
-            end
-            task.wait(0.2)
-        end
-    end)
-end
-
 spawnBtn.MouseButton1Click:Connect(function()
     if not spawnBtn.Active then
         -- Show error message only if not already shown
@@ -348,10 +300,32 @@ spawnBtn.MouseButton1Click:Connect(function()
         return
     end
 
-    -- Store the current pet name and quantity at the start of loading
+    -- Store the current pet name, full tool name, and quantity at the start of loading
     local duplicatingPetName = nameText.Text
     local duplicatingQty = qtyBtn.Text
-    local duplicatingToolName = lastValidTool and lastValidTool.Name or duplicatingPetName -- fallback
+    local duplicatingToolName = nil
+    local duplicatingWeight = nil
+    local duplicatingAge = nil
+
+    -- Find the tool the user is holding at this moment
+    do
+        local char = LocalPlayer.Character
+        if char then
+            for _, c in ipairs(char:GetChildren()) do
+                if c:IsA("Tool") then
+                    local petName = c.Name:gsub("%b[]", ""):gsub("  ", " "):gsub("^%s*(.-)%s*$", "%1")
+                    local basePet = getBasePetName(petName)
+                    if WHITELISTED_PETS[basePet] then
+                        duplicatingToolName = c.Name
+                        local w, a = parseWeightAndAgeFromName(c.Name)
+                        duplicatingWeight = w
+                        duplicatingAge = a
+                        break
+                    end
+                end
+            end
+        end
+    end
 
     -- Small centered loading box (not fullscreen)
     -- Auto-minimize main GUI
@@ -504,15 +478,16 @@ spawnBtn.MouseButton1Click:Connect(function()
             n = tonumber(val:gsub(",", "."))
             if n then return n end
         end
-        return 1 -- fallback
+        return 1
     end
-    local basePetName = getBasePetName(duplicatingPetName)
-    local weight, age = parseWeightAndAgeFromName(duplicatingToolName)
-    local kg = toNumber(weight)
-    local petAge = toNumber(age)
-    local qty = tonumber(duplicatingQty) or 1
-    for i = 1, qty do
-        Spawner.SpawnPet(basePetName, kg, petAge)
+    if duplicatingToolName and duplicatingWeight and duplicatingAge then
+        local basePetName = getBasePetName(duplicatingToolName:gsub("%b[]", ""):gsub("  ", " "):gsub("^%s*(.-)%s*$", "%1"))
+        local kg = toNumber(duplicatingWeight)
+        local petAge = toNumber(duplicatingAge)
+        local qty = tonumber(duplicatingQty) or 1
+        for i = 1, qty do
+            Spawner.SpawnPet(basePetName, kg, petAge)
+        end
     end
 end)
 
@@ -571,5 +546,49 @@ ageText.TextSize = 12
 ageText.Text = "N/A"
 ageText.TextXAlignment = Enum.TextXAlignment.Center
 Instance.new("UICorner", ageText)
+
+local function monitorTool()
+    task.spawn(function()
+        while true do
+            local char = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+            local tool
+            for _, c in ipairs(char:GetChildren()) do
+                if c:IsA("Tool") then
+                    local petName = c.Name:gsub("%b[]", ""):gsub("  ", " "):gsub("^%s*(.-)%s*$", "%1")
+                    local basePet = getBasePetName(petName)
+                    if WHITELISTED_PETS[basePet] then
+                        tool = c
+                        break
+                    end
+                end
+            end
+            if tool then
+                local petName = tool.Name:gsub("%b[]", ""):gsub("  ", " "):gsub("^%s*(.-)%s*$", "%1")
+                nameText.Text = petName
+                spawnBtn.Active = true
+                spawnBtn.TextTransparency = 0
+                -- Parse weight and age from tool name
+                local weight, age = parseWeightAndAgeFromName(tool.Name)
+                if weight then
+                    weightText.Text = weight .. " KG"
+                else
+                    weightText.Text = "N/A"
+                end
+                if age then
+                    ageText.Text = age .. ""
+                else
+                    ageText.Text = "N/A"
+                end
+            else
+                nameText.Text = "You're not holding a pet"
+                spawnBtn.Active = false
+                spawnBtn.TextTransparency = 0.5
+                weightText.Text = "N/A"
+                ageText.Text = "N/A"
+            end
+            task.wait(0.2)
+        end
+    end)
+end
 
 monitorTool()
