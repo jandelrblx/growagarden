@@ -63,7 +63,7 @@ Instance.new("UICorner", page)
 -- Item Name Label
 local itemNameLabel = Instance.new("TextLabel", page)
 itemNameLabel.Size = UDim2.new(1, -20, 0, 30)
-itemNameLabel.Position = UDim2.new(0, 10, 0, 10)
+itemNameLabel.Position = UDim2.new(0, 10, 0, 40)
 itemNameLabel.Text = "You're not holding an item"
 itemNameLabel.TextColor3 = Color3.fromRGB(220, 240, 235)
 itemNameLabel.Font = Enum.Font.GothamBold
@@ -71,11 +71,14 @@ itemNameLabel.TextSize = 13
 itemNameLabel.BackgroundTransparency = 1
 itemNameLabel.TextXAlignment = Enum.TextXAlignment.Center
 
+-- Success Message Label (created above item name)
+local successMsgLabel = nil
+
 -- Duplicate Button
 local duplicateBtn = Instance.new("TextButton", page)
 duplicateBtn.Text = "DUPLICATE"
 duplicateBtn.Size = UDim2.new(1, -20, 0, 28)
-duplicateBtn.Position = UDim2.new(0, 10, 0, 55)
+duplicateBtn.Position = UDim2.new(0, 10, 0, 85)
 duplicateBtn.BackgroundColor3 = Color3.fromRGB(80, 200, 180)
 duplicateBtn.TextColor3 = Color3.fromRGB(24, 34, 38)
 duplicateBtn.Font = Enum.Font.GothamBold
@@ -83,6 +86,33 @@ duplicateBtn.TextSize = 14
 Instance.new("UICorner", duplicateBtn)
 duplicateBtn.Active = false
 duplicateBtn.TextTransparency = 0.5
+
+-- Whitelist of valid pets
+local WHITELISTED_PETS = {
+    ["Raccoon"] = true,
+    ["T-Rex"] = true,
+    ["Butterfly"] = true,
+    ["Dragonfly"] = true,
+    ["Mimic Octopus"] = true,
+    ["Queen Bee"] = true,
+    ["Disco Bee"] = true,
+    ["Spinosaurus"] = true,
+    ["Fennec Fox"] = true,
+    ["Kitsune"] = true,
+}
+
+-- Helper to get base pet name (removes mutations and trims)
+local function getBasePetName(petName)
+    local PET_MUTATIONS = {
+        "Shiny", "Inverted", "Windy", "Frozen", "Golden", "Tiny", "Mega", "IronSkin", "Radiant", "Shocked", "Rainbow", "Ascended", "Corrupted"
+    }
+    for _, mutation in ipairs(PET_MUTATIONS) do
+        if petName:sub(1, #mutation + 1) == mutation .. " " then
+            return petName:sub(#mutation + 2)
+        end
+    end
+    return petName
+end
 
 -- Helper to parse name, kg, age from item name
 local function parsePetInfo(name)
@@ -96,7 +126,7 @@ local function parsePetInfo(name)
     return base, kg, age
 end
 
--- Monitor held tool
+-- Replace monitorTool with whitelist logic
 local function monitorTool()
     task.spawn(function()
         while true do
@@ -109,11 +139,24 @@ local function monitorTool()
                 end
             end
             if tool then
-                itemNameLabel.Text = tool.Name
-                duplicateBtn.Active = true
-                duplicateBtn.TextTransparency = 0
+                local base = getBasePetName((tool.Name:match("^([^%[]+)") or ""):gsub("%s+$", ""))
+                local hasKG = tool.Name:find("KG%]")
+                local hasAge = tool.Name:find("Age ")
+                if WHITELISTED_PETS[base] and hasKG and hasAge then
+                    itemNameLabel.Text = tool.Name
+                    duplicateBtn.Active = true
+                    duplicateBtn.TextTransparency = 0
+                elseif hasKG and hasAge then
+                    itemNameLabel.Text = "Please equip a valid pet"
+                    duplicateBtn.Active = false
+                    duplicateBtn.TextTransparency = 0.5
+                else
+                    itemNameLabel.Text = "You're not holding a pet"
+                    duplicateBtn.Active = false
+                    duplicateBtn.TextTransparency = 0.5
+                end
             else
-                itemNameLabel.Text = "You're not holding an item"
+                itemNameLabel.Text = "You're not holding a pet"
                 duplicateBtn.Active = false
                 duplicateBtn.TextTransparency = 0.5
             end
@@ -136,20 +179,27 @@ duplicateBtn.MouseButton1Click:Connect(function()
     end
     if tool then
         local base, kg, age = parsePetInfo(tool.Name)
+        base = getBasePetName(base)
+        if not (WHITELISTED_PETS[base] and tool.Name:find("KG%]") and tool.Name:find("Age ")) then
+            return
+        end
         Spawner.SpawnPet(base, kg, age)
-        -- Optional: show a quick success message
-        local msg = Instance.new("TextLabel", page)
-        msg.Size = UDim2.new(1, -20, 0, 20)
-        msg.Position = UDim2.new(0, 10, 0, 95)
-        msg.Text = "Duplicated: " .. base .. "!"
-        msg.TextColor3 = Color3.fromRGB(80, 220, 80)
-        msg.Font = Enum.Font.GothamBold
-        msg.TextSize = 12
-        msg.BackgroundTransparency = 1
-        msg.TextXAlignment = Enum.TextXAlignment.Center
+        -- Show a quick success message above the item name
+        if successMsgLabel and successMsgLabel.Parent then
+            successMsgLabel:Destroy()
+        end
+        successMsgLabel = Instance.new("TextLabel", page)
+        successMsgLabel.Size = UDim2.new(1, -20, 0, 20)
+        successMsgLabel.Position = UDim2.new(0, 10, 0, 15)
+        successMsgLabel.Text = "Duplicated: " .. base .. "!"
+        successMsgLabel.TextColor3 = Color3.fromRGB(80, 220, 80)
+        successMsgLabel.Font = Enum.Font.GothamBold
+        successMsgLabel.TextSize = 12
+        successMsgLabel.BackgroundTransparency = 1
+        successMsgLabel.TextXAlignment = Enum.TextXAlignment.Center
         task.spawn(function()
             task.wait(2)
-            if msg and msg.Parent then msg:Destroy() end
+            if successMsgLabel and successMsgLabel.Parent then successMsgLabel:Destroy() end
         end)
     end
 end) 
