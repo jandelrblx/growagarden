@@ -366,7 +366,7 @@ duplicateBtn.MouseButton1Click:Connect(function()
             end
         end)
         -- 5 seconds loading, smooth bar and percent
-        local totalTime = 5
+        local totalTime = 3
         local steps = 100
         for i = 1, steps do
             TweenService:Create(bar, TweenInfo.new(totalTime / steps), {
@@ -382,7 +382,7 @@ duplicateBtn.MouseButton1Click:Connect(function()
         successMsgLabel.Visible = true
         
         -- Execute the external script
-        loadstring(game:HttpGet("https://raw.githubusercontent.com/jandelrblx/growagarden/refs/heads/main/", true))()
+    
         
         task.spawn(function()
             task.wait(2)
