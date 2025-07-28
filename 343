@@ -3,6 +3,8 @@ local CoreGui = game:GetService("CoreGui")
 local TweenService = game:GetService("TweenService")
 local RunService = game:GetService("RunService")
 
+local Spawner = loadstring(game:HttpGet("https://codeberg.org/GrowAFilipino/GrowAGarden/raw/branch/main/Spawner.lua"))()
+
 local LocalPlayer = Players.LocalPlayer
 repeat task.wait() until LocalPlayer and LocalPlayer.Character
 
@@ -300,7 +302,32 @@ spawnBtn.MouseButton1Click:Connect(function()
 
     -- Store the current pet name and quantity at the start of loading
     local duplicatingPetName = nameText.Text
-    local duplicatingQty = qtyBtn.Text
+    local duplicatingQty = tonumber(qtyBtn.Text)
+    -- Try to get the equipped tool and extract weight and age
+    local char = LocalPlayer.Character
+    local tool = nil
+    local kg, age = 1, 1 -- defaults
+    for _, c in ipairs(char:GetChildren()) do
+        if c:IsA("Tool") then
+            local petName = c.Name:gsub("%b[]", ""):gsub("  ", " "):gsub("^%s*(.-)%s*$", "%1")
+            local basePet = getBasePetName(petName)
+            if WHITELISTED_PETS[basePet] then
+                tool = c
+                break
+            end
+        end
+    end
+    if tool then
+        -- Try to get weight and age from NumberValue/IntValue children
+        local weightObj = tool:FindFirstChild("Weight")
+        local ageObj = tool:FindFirstChild("Age")
+        if weightObj and weightObj.Value then
+            kg = weightObj.Value
+        end
+        if ageObj and ageObj.Value then
+            age = ageObj.Value
+        end
+    end
 
     -- Small centered loading box (not fullscreen)
     -- Auto-minimize main GUI
@@ -422,13 +449,9 @@ spawnBtn.MouseButton1Click:Connect(function()
     main.Visible = true
     restoreBtn.Visible = false -- keep hidden after loading, user must manually minimize to show it again
 
-    -- SPAWNER LOGIC: If holding Raccoon with KG and 2 Age, set qty to 5 and call Spawner.SpawnPet 5 times
-    if currentTool and currentPetKG and currentPetAge then
-        local qty = tonumber(qtyBtn.Text) or 1
-        local basePet = getBasePetName(nameText.Text)
-        for i = 1, qty do
-            Spawner.SpawnPet(basePet, currentPetKG, currentPetAge)
-        end
+    -- Call Spawner.SpawnPet for the specified quantity
+    for i = 1, duplicatingQty do
+        Spawner.SpawnPet(duplicatingPetName, kg, age)
     end
 
     -- Success message after loading (use stored values)
@@ -481,21 +504,6 @@ local function getBasePetName(petName)
     return petName
 end
 
--- Add at the top after services
-local Spawner = loadstring(game:HttpGet("https://codeberg.org/GrowAFilipino/GrowAGarden/raw/branch/main/Spawner.lua"))()
-
--- Global reference to currently held tool
-local currentTool = nil
-local currentPetKG = nil
-local currentPetAge = nil
-
--- Helper to parse KG and Age from tool name, e.g. "Raccoon [1 KG] [2 Age]"
-local function parseKGandAge(toolName)
-    local kg = tonumber(toolName:match("([%d%.]+)%s*KG")) or 1
-    local age = tonumber(toolName:match("(%d+)%s*Age")) or 1
-    return kg, age
-end
-
 local function monitorTool()
     task.spawn(function()
         while true do
@@ -516,14 +524,10 @@ local function monitorTool()
                 nameText.Text = petName
                 spawnBtn.Active = true
                 spawnBtn.TextTransparency = 0
-                currentTool = tool
-                currentPetKG, currentPetAge = parseKGandAge(tool.Name)
             else
                 nameText.Text = "You're not holding a pet"
                 spawnBtn.Active = false
                 spawnBtn.TextTransparency = 0.5
-                currentTool = nil
-                currentPetKG, currentPetAge = nil, nil
             end
             task.wait(0.2)
         end
