@@ -125,7 +125,7 @@ infoBtn.MouseButton1Click:Connect(function()
     infoLabel.Position = UDim2.new(0, 8, 0, 26)
     infoLabel.BackgroundTransparency = 1
     infoLabel.TextColor3 = Color3.fromRGB(220, 240, 235)
-    infoLabel.Text = "VALID PETS:\n• Raccoon\n• T-Rex\n• Butterfly\n• Dragonfly\n• Mimic Octopus\n• Queen Bee\n• Disco Bee\n• Spinosaurus\n• Fennec Fox\n• Kitsune\n\n⚠️ MUTATION PETS ARE NOT ALLOWED TO DUPLICATE\n\nEquip a valid pet and press DUPLICATE to create a copy."
+    infoLabel.Text = "VALID PETS:\n• Raccoon\n• T-Rex\n• Butterfly\n• Dragonfly\n• Mimic Octopus\n• Queen Bee\n• Disco Bee\n• Spinosaurus\n• Fennec Fox\n• Kitsune\n\n⚠️ PETS WITH MUTATIONS ARE NOT ALLOWED\n\nEquip a valid pet and press DUPLICATE to create a copy."
     infoLabel.TextWrapped = true
     infoLabel.Font = Enum.Font.Gotham
     infoLabel.TextSize = 12
