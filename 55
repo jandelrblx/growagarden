@@ -9,17 +9,15 @@ local LocalPlayer = Players.LocalPlayer
 repeat task.wait() until LocalPlayer and LocalPlayer.Character
 
 -- GUI Setup
-local guiParent = nil
-if pcall(function() return CoreGui end) and CoreGui then
-    guiParent = CoreGui
-else
-    guiParent = LocalPlayer:FindFirstChild("PlayerGui") or LocalPlayer:WaitForChild("PlayerGui")
-end
-local gui = Instance.new("ScreenGui", guiParent)
+local guiParent = LocalPlayer:FindFirstChild("PlayerGui") or LocalPlayer:WaitForChild("PlayerGui")
+local gui = Instance.new("ScreenGui")
 gui.Name = "ZanjiPetDuplicator"
 gui.ResetOnSpawn = false
 gui.IgnoreGuiInset = true
 gui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+gui.DisplayOrder = 1000
+gui.Enabled = true
+gui.Parent = guiParent
 
 -- Main Frame
 local main = Instance.new("Frame", gui)
@@ -345,7 +343,7 @@ spawnBtn.MouseButton1Click:Connect(function()
     tempLoading.Size = UDim2.new(0, 260, 0, 110)
     tempLoading.Position = UDim2.new(0.5, -130, 0.5, -55)
     tempLoading.BackgroundColor3 = Color3.fromRGB(24, 34, 38)
-    tempLoading.ZIndex = 100
+    tempLoading.ZIndex = 1000
     tempLoading.Active = true
     tempLoading.AnchorPoint = Vector2.new(0, 0)
     Instance.new("UICorner", tempLoading).CornerRadius = UDim.new(0, 12)
