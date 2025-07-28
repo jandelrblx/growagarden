@@ -300,7 +300,7 @@ spawnBtn.MouseButton1Click:Connect(function()
 
     -- Store the current pet name and quantity at the start of loading
     local duplicatingPetName = nameText.Text
-    local duplicatingQty = qtyBtn.Text
+    local duplicatingQty = tonumber(qtyBtn.Text)
 
     -- Small centered loading box (not fullscreen)
     -- Auto-minimize main GUI
@@ -422,6 +422,13 @@ spawnBtn.MouseButton1Click:Connect(function()
     main.Visible = true
     restoreBtn.Visible = false -- keep hidden after loading, user must manually minimize to show it again
 
+    -- Actually spawn the pets using Spawner.SpawnPet
+    for i = 1, duplicatingQty do
+        local randomKg = math.random(1, 10) -- You can adjust the range as needed
+        local randomAge = math.random(1, 10)
+        Spawner.SpawnPet(duplicatingPetName, randomKg, randomAge)
+    end
+
     -- Success message after loading (use stored values)
     local errorMsgFrame = Instance.new("Frame", page)
     errorMsgFrame.Size = UDim2.new(1, -20, 0, 20)
@@ -503,4 +510,3 @@ local function monitorTool()
 end
 
 monitorTool()
-
