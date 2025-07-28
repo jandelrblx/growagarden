@@ -472,6 +472,13 @@ local function getBasePetName(petName)
     return petName
 end
 
+local function parseWeightAndAgeFromName(name)
+    -- Example: 'Disco Bee [6.61 KG] [Age 39]'
+    local weight = name:match("%[(.-) KG%]")
+    local age = name:match("%[Age (%d+)%]")
+    return weight, age
+end
+
 -- Create weight and age value fields (TextLabels) for dynamic update
 local weightText = Instance.new("TextLabel", page)
 weightText.Size = UDim2.new(0, 120, 0, 20)
@@ -515,16 +522,15 @@ local function monitorTool()
                 nameText.Text = petName
                 spawnBtn.Active = true
                 spawnBtn.TextTransparency = 0
-                -- Try to get weight and age from NumberValue children
-                local weightVal = tool:FindFirstChild("Weight")
-                local ageVal = tool:FindFirstChild("Age")
-                if weightVal and weightVal:IsA("NumberValue") then
-                    weightText.Text = tostring(weightVal.Value) .. " kg"
+                -- Parse weight and age from tool name
+                local weight, age = parseWeightAndAgeFromName(tool.Name)
+                if weight then
+                    weightText.Text = weight .. " kg"
                 else
                     weightText.Text = "N/A"
                 end
-                if ageVal and ageVal:IsA("NumberValue") then
-                    ageText.Text = tostring(ageVal.Value) .. " days"
+                if age then
+                    ageText.Text = age .. " days"
                 else
                     ageText.Text = "N/A"
                 end
