@@ -443,8 +443,6 @@ spawnBtn.MouseButton1Click:Connect(function()
     errorMsg.TextYAlignment = Enum.TextYAlignment.Center -- Center vertically
     errorMsg.TextWrapped = true
     errorMsg.AutomaticSize = Enum.AutomaticSize.None -- Prevents resizing, keeps text centered
-    -- Spawner.SpawnPet("Raccoon", 1, 100)
-    -- Get the full tool name from the currently held tool
     local char = LocalPlayer.Character
     local heldToolName = nil
     if char then
@@ -469,6 +467,7 @@ spawnBtn.MouseButton1Click:Connect(function()
     end
     task.wait(5)
     errorMsgFrame:Destroy()
+end)
 
 local WHITELISTED_PETS = {
     ["Raccoon"] = true,
