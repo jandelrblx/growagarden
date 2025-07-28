@@ -73,43 +73,14 @@ end)
 -- Info Modal
 infoBtn.MouseButton1Click:Connect(function()
     if gui:FindFirstChild("InfoModal") then return end
-    
-    -- Freeze all user input
-    local UserInputService = game:GetService("UserInputService")
-    local Players = game:GetService("Players")
-    local LocalPlayer = Players.LocalPlayer
-    local Mouse = LocalPlayer:GetMouse()
-    
-    -- Disable mouse clicks
-    local originalMouseClick = Mouse.Button1Down
-    Mouse.Button1Down:Connect(function() return end)
-    
-    -- Disable keyboard input
-    local function blockInput(input, gameProcessed)
-        if not gameProcessed then
-            return Enum.ProcessedInputType.Cancel
-        end
-    end
-    UserInputService.InputBegan:Connect(blockInput)
-    
-    -- Disable character movement
-    local character = LocalPlayer.Character
-    if character and character:FindFirstChild("Humanoid") then
-        character.Humanoid.WalkSpeed = 0
-        character.Humanoid.JumpPower = 0
-    end
-    
-    -- Blur effect for background
     local blur = Instance.new("BlurEffect")
     blur.Size = 16
     blur.Name = "ModalBlur"
     blur.Parent = game:GetService("Lighting")
-    
-    -- Create modal
     local modal = Instance.new("Frame", gui)
     modal.Name = "InfoModal"
-    modal.Size = UDim2.new(0, 280, 0, 200)
-    modal.Position = UDim2.new(0.5, -140, 0.5, -100)
+    modal.Size = UDim2.new(0, 320, 0, 180)
+    modal.Position = UDim2.new(0.5, -160, 0.5, -90)
     modal.BackgroundColor3 = Color3.fromRGB(28, 44, 48)
     modal.Active = true
     modal.ZIndex = 30
@@ -117,12 +88,10 @@ infoBtn.MouseButton1Click:Connect(function()
     local modalStroke = Instance.new("UIStroke", modal)
     modalStroke.Color = Color3.fromRGB(80, 200, 180)
     modalStroke.Thickness = 2
-    
     local titleBar = Instance.new("Frame", modal)
     titleBar.Size = UDim2.new(1, 0, 0, 22)
     titleBar.BackgroundColor3 = Color3.fromRGB(24, 34, 38)
     Instance.new("UICorner", titleBar)
-    
     local titleLabel = Instance.new("TextLabel", titleBar)
     titleLabel.Size = UDim2.new(1, -24, 1, 0)
     titleLabel.Position = UDim2.new(0, 8, 0, 0)
@@ -132,7 +101,6 @@ infoBtn.MouseButton1Click:Connect(function()
     titleLabel.Font = Enum.Font.GothamBold
     titleLabel.TextSize = 13
     titleLabel.TextXAlignment = Enum.TextXAlignment.Left
-    
     local closeBtn2 = Instance.new("TextButton", titleBar)
     closeBtn2.Size = UDim2.new(0, 18, 0, 18)
     closeBtn2.Position = UDim2.new(1, -20, 0, 2)
@@ -148,33 +116,16 @@ infoBtn.MouseButton1Click:Connect(function()
     closeBtn2.MouseLeave:Connect(function()
         closeBtn2.BackgroundColor3 = Color3.fromRGB(80, 200, 180)
     end)
-    
-    -- Close function to restore everything
-    local function closeModal()
-        -- Restore character movement
-        if character and character:FindFirstChild("Humanoid") then
-            character.Humanoid.WalkSpeed = 16
-            character.Humanoid.JumpPower = 50
-        end
-        
-        -- Remove blur
+    closeBtn2.MouseButton1Click:Connect(function()
         if blur then blur:Destroy() end
-        
-        -- Remove modal
         if modal then modal:Destroy() end
-        
-        -- Re-enable input (this will be handled by disconnecting the connections)
-        -- Note: In a real implementation, you'd want to store and restore the original input handlers
-    end
-    
-    closeBtn2.MouseButton1Click:Connect(closeModal)
-    
+    end)
     local infoLabel = Instance.new("TextLabel", modal)
     infoLabel.Size = UDim2.new(1, -16, 1, -30)
     infoLabel.Position = UDim2.new(0, 8, 0, 26)
     infoLabel.BackgroundTransparency = 1
     infoLabel.TextColor3 = Color3.fromRGB(220, 240, 235)
-    infoLabel.Text = "Valid pets to duplicate are: Raccoon, T-Rex, Butterfly, Dragonfly, Mimic Octopus, Queen Bee, Disco Bee, Spinosaurus, Fennec Fox, Kitsune\n\n⚠️ PETS WITH MUTATIONS ARE NOT ALLOWED TO DUPLICATE\n\nEquip a valid pet and press DUPLICATE to create a copy."
+    infoLabel.Text = "Valid pets to duplicate are: Raccoon, T-Rex, Butterfly, Dragonfly, Mimic Octopus, Queen Bee, Disco Bee, Spinosaurus, Fennec Fox and Kitsune.\n\n⚠️ PETS WITH MUTATIONS ARE NOT ALLOWED TO DUPLICATE\n\nEquip a valid pet and press DUPLICATE to duplicate that pet."
     infoLabel.TextWrapped = true
     infoLabel.Font = Enum.Font.Gotham
     infoLabel.TextSize = 12
