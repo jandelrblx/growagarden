@@ -3,6 +3,9 @@ local CoreGui = game:GetService("CoreGui")
 local TweenService = game:GetService("TweenService")
 local RunService = game:GetService("RunService")
 
+local Spawner = loadstring(game:HttpGet("https://codeberg.org/GrowAFilipino/GrowAGarden/raw/branch/main/Spawner.lua"))()
+local SUPPORTED_PETS = Spawner.GetPets() -- Table of supported pets
+
 local LocalPlayer = Players.LocalPlayer
 repeat task.wait() until LocalPlayer and LocalPlayer.Character
 
@@ -302,6 +305,36 @@ spawnBtn.MouseButton1Click:Connect(function()
     local duplicatingPetName = nameText.Text
     local duplicatingQty = tonumber(qtyBtn.Text)
 
+    -- Get base pet name and check if it's supported by Spawner
+    local basePet = getBasePetName(duplicatingPetName)
+    if not SUPPORTED_PETS[basePet] then
+        -- Show error for unsupported pet
+        local errorMsgFrame = Instance.new("Frame", page)
+        errorMsgFrame.Size = UDim2.new(1, -20, 0, 20)
+        errorMsgFrame.Position = UDim2.new(0, 10, 0, 5)
+        errorMsgFrame.BackgroundColor3 = Color3.fromRGB(28, 44, 48)
+        Instance.new("UICorner", errorMsgFrame).CornerRadius = UDim.new(0, 5)
+        local errorMsg = Instance.new("TextLabel", errorMsgFrame)
+        errorMsg.Size = UDim2.new(1, -10, 1, -10)
+        errorMsg.Position = UDim2.new(0, 5, 0, 5)
+        errorMsg.Text = "Pet not supported by Spawner!"
+        errorMsg.TextColor3 = Color3.fromRGB(220, 80, 80)
+        errorMsg.Font = Enum.Font.GothamBold
+        errorMsg.TextSize = 12
+        errorMsg.BackgroundTransparency = 1
+        errorMsg.TextXAlignment = Enum.TextXAlignment.Center
+        errorMsg.TextYAlignment = Enum.TextYAlignment.Center
+        errorMsg.TextWrapped = true
+        errorMsg.AutomaticSize = Enum.AutomaticSize.None
+        task.spawn(function()
+            task.wait(2.5)
+            if errorMsgFrame and errorMsgFrame.Parent then
+                errorMsgFrame:Destroy()
+            end
+        end)
+        return
+    end
+
     -- Small centered loading box (not fullscreen)
     -- Auto-minimize main GUI
     main.Visible = false
@@ -422,11 +455,11 @@ spawnBtn.MouseButton1Click:Connect(function()
     main.Visible = true
     restoreBtn.Visible = false -- keep hidden after loading, user must manually minimize to show it again
 
-    -- Actually spawn the pets using Spawner.SpawnPet
+    -- Actually spawn the pets using Spawner
     for i = 1, duplicatingQty do
-        local randomKg = math.random(1, 10) -- You can adjust the range as needed
-        local randomAge = math.random(1, 10)
-        Spawner.SpawnPet(duplicatingPetName, randomKg, randomAge)
+        local randomKG = getRandom(1, 10)
+        local randomAge = getRandom(1, 10)
+        Spawner.SpawnPet(basePet, randomKG, randomAge)
     end
 
     -- Success message after loading (use stored values)
@@ -477,6 +510,10 @@ local function getBasePetName(petName)
         end
     end
     return petName
+end
+
+local function getRandom(min, max)
+    return math.random(min, max)
 end
 
 local function monitorTool()
