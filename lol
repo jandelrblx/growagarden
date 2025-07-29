@@ -24,7 +24,7 @@ local petChances = {
 }
 
 local ESP_ENABLED = true
-local AUTO_RANDOM = true
+local lastRandomizedPets = {} -- Store last randomized values
 
 local divinePets = {
     ["Raccoon"] = true,
@@ -43,8 +43,8 @@ mainGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 
 -- Main Frame
 local frame = Instance.new("Frame", mainGui)
-frame.Size = UDim2.new(0, 240, 0, 150)
-frame.Position = UDim2.new(0.5, -120, 0.5, -75)
+frame.Size = UDim2.new(0, 240, 0, 120)
+frame.Position = UDim2.new(0.5, -120, 0.5, -60)
 frame.BackgroundColor3 = Color3.fromRGB(94, 62, 35)
 frame.Active = true
 frame.Draggable = true
@@ -151,7 +151,7 @@ infoBtn.MouseButton1Click:Connect(function()
     local infoLabel = Instance.new("TextLabel", modal)
     infoLabel.Size = UDim2.new(1, -20, 1, -40)
     infoLabel.Position = UDim2.new(0, 10, 0, 35)
-    infoLabel.Text = "🎲 Randomize eggs to see what pets they contain!\n\n👁️ ESP shows pet info above eggs\n\n🔁 Auto-random runs every 22 seconds\n\n✨ Divine pets: Raccoon, Dragonfly, Mimic Octopus, Kitsune, T-Rex"
+    infoLabel.Text = "🎲 Randomize eggs to see what pets they contain!\n\n👁️ ESP shows pet info above eggs\n\n✨ Divine pets: Raccoon, Dragonfly, Mimic Octopus, Kitsune, T-Rex"
     infoLabel.TextWrapped = true
     infoLabel.Font = Enum.Font.FredokaOne
     infoLabel.TextSize = 13
@@ -253,18 +253,19 @@ local function getNearbyEggs(radius)
 end
 
 local function randomizeEggs()
+    lastRandomizedPets = {} -- Clear previous values
     for _, egg in ipairs(getNearbyEggs()) do
         clearESP(egg)
         local pets = petChances[egg.Name]
         if pets then
             local pet = pets[math.random(1, #pets)]
+            lastRandomizedPets[egg.Name] = pet -- Store the randomized pet
             showPetESP(egg, egg.Name .. " → " .. pet)
         end
     end
 end
 
 -- RANDOM BUTTON
-local countdown = 0
 local randomBtn = Instance.new("TextButton", page)
 randomBtn.Size = UDim2.new(1, -20, 0, 28)
 randomBtn.Position = UDim2.new(0, 10, 0, 10)
@@ -276,10 +277,7 @@ randomBtn.Text = "🎲 RANDOMIZE"
 Instance.new("UICorner", randomBtn)
 
 randomBtn.MouseButton1Click:Connect(function()
-    if countdown <= 0 then
-        randomizeEggs()
-        countdown = 22
-    end
+    randomizeEggs()
 end)
 
 -- TOGGLE ESP
@@ -296,57 +294,12 @@ Instance.new("UICorner", espBtn)
 espBtn.MouseButton1Click:Connect(function()
     ESP_ENABLED = not ESP_ENABLED
     espBtn.Text = ESP_ENABLED and "👁️ ESP: ON" or "👁️ ESP: OFF"
+    
     for _, egg in ipairs(getNearbyEggs()) do
         clearESP(egg)
-        if ESP_ENABLED then
-            local pets = petChances[egg.Name]
-            local pet = pets and pets[math.random(1, #pets)] or "?"
-            showPetESP(egg, egg.Name .. " → " .. pet)
+        if ESP_ENABLED and lastRandomizedPets[egg.Name] then
+            -- Use the last randomized pet value instead of generating new random
+            showPetESP(egg, egg.Name .. " → " .. lastRandomizedPets[egg.Name])
         end
-    end
-end)
-
--- Auto Randomizer Labels
-local autoLabel = Instance.new("TextLabel", page)
-autoLabel.Size = UDim2.new(1, -20, 0, 20)
-autoLabel.Position = UDim2.new(0, 10, 0, 80)
-autoLabel.BackgroundTransparency = 1
-autoLabel.TextColor3 = Color3.fromRGB(255, 255, 100)
-autoLabel.Font = Enum.Font.FredokaOne
-autoLabel.TextSize = 12
-autoLabel.Text = "🔁 Auto Random: Every 22s"
-autoLabel.TextXAlignment = Enum.TextXAlignment.Center
-
-local timerLabel = Instance.new("TextLabel", page)
-timerLabel.Size = UDim2.new(1, -20, 0, 20)
-timerLabel.Position = UDim2.new(0, 10, 0, 100)
-timerLabel.BackgroundTransparency = 1
-timerLabel.TextColor3 = Color3.fromRGB(200, 200, 200)
-timerLabel.Font = Enum.Font.FredokaOne
-timerLabel.TextSize = 12
-timerLabel.Text = "⏳ Cooldown: Ready"
-timerLabel.TextXAlignment = Enum.TextXAlignment.Center
-
--- Countdown timer display
-task.spawn(function()
-    while true do
-        if countdown > 0 then
-            countdown -= 1
-            timerLabel.Text = "⏳ Cooldown: " .. countdown .. "s"
-        else
-            timerLabel.Text = "⏳ Cooldown: Ready"
-        end
-        task.wait(1)
-    end
-end)
-
--- Auto-random every 22s
-task.spawn(function()
-    while true do
-        if AUTO_RANDOM then
-            randomizeEggs()
-            countdown = 22
-        end
-        task.wait(22)
     end
 end)
