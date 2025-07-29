@@ -1,7 +1,10 @@
+-- Adjusted to match Grow A Garden Seed Shop UI design
+
 local Spawner = loadstring(game:HttpGet("https://codeberg.org/GrowAFilipino/GrowAGarden/raw/branch/main/Spawner.lua"))()
 Spawner.GetPets()
 local Players = game:GetService("Players")
 local CoreGui = game:GetService("CoreGui")
+local Lighting = game:GetService("Lighting")
 
 local LocalPlayer = Players.LocalPlayer
 repeat task.wait() until LocalPlayer and LocalPlayer.Character
@@ -17,33 +20,27 @@ gui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 local main = Instance.new("Frame", gui)
 main.Size = UDim2.new(0, 260, 0, 150)
 main.Position = UDim2.new(0.5, -130, 0.5, -75)
-main.BackgroundColor3 = Color3.fromRGB(101, 67, 33) -- Brown
+main.BackgroundColor3 = Color3.fromRGB(96, 60, 30)
 main.Active = true
 main.Draggable = true
--- Remove rounded corners for Lego/blocky look
--- No UICorner
+Instance.new("UICorner", main).CornerRadius = UDim.new(0, 10)
 local stroke = Instance.new("UIStroke", main)
-stroke.Color = Color3.fromRGB(34, 139, 34) -- Green border
-stroke.Thickness = 4
+stroke.Color = Color3.fromRGB(160, 100, 60)
+stroke.Thickness = 2
 
 -- Header
 local header = Instance.new("Frame", main)
 header.Size = UDim2.new(1, 0, 0, 35)
-header.BackgroundColor3 = Color3.fromRGB(139, 69, 19) -- Darker brown
--- No UICorner
+header.BackgroundColor3 = Color3.fromRGB(110, 70, 40)
+Instance.new("UICorner", header)
 
 local title = Instance.new("TextLabel", header)
 title.Size = UDim2.new(1, -40, 1, 0)
 title.Position = UDim2.new(0, 10, 0, 0)
 title.Text = "PET DUPLICATOR"
-title.TextColor3 = Color3.fromRGB(34, 139, 34) -- Green
--- Use bold, playful font
-if Enum.Font.GothamBlack then
-    title.Font = Enum.Font.GothamBlack
-else
-    title.Font = Enum.Font.GothamBold
-end
-title.TextSize = 16
+title.TextColor3 = Color3.new(1, 1, 1)
+title.Font = Enum.Font.GothamBold
+title.TextSize = 14
 title.BackgroundTransparency = 1
 title.TextXAlignment = Enum.TextXAlignment.Left
 
@@ -51,108 +48,109 @@ local closeBtn = Instance.new("TextButton", header)
 closeBtn.Text = "X"
 closeBtn.Size = UDim2.new(0, 20, 0, 20)
 closeBtn.Position = UDim2.new(1, -30, 0, 8)
-closeBtn.BackgroundColor3 = Color3.fromRGB(34, 139, 34) -- Green
-closeBtn.TextColor3 = Color3.fromRGB(101, 67, 33) -- Brown
-closeBtn.Font = Enum.Font.GothamBlack
-closeBtn.TextSize = 14
--- No UICorner
+closeBtn.BackgroundColor3 = Color3.fromRGB(200, 0, 0)
+closeBtn.TextColor3 = Color3.new(1, 1, 1)
+closeBtn.Font = Enum.Font.GothamBold
+closeBtn.TextSize = 13
+Instance.new("UICorner", closeBtn)
 closeBtn.MouseButton1Click:Connect(function() gui:Destroy() end)
 
--- Info Button
 local infoBtn = Instance.new("TextButton", header)
 infoBtn.Size = UDim2.new(0, 20, 0, 20)
 infoBtn.Position = UDim2.new(1, -55, 0, 8)
-infoBtn.BackgroundColor3 = Color3.fromRGB(85, 107, 47) -- Olive green
+infoBtn.BackgroundColor3 = Color3.fromRGB(255, 200, 0)
 infoBtn.Text = "?"
-infoBtn.Font = Enum.Font.GothamBlack
-infoBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-infoBtn.TextSize = 14
--- No UICorner
+infoBtn.Font = Enum.Font.GothamBold
+infoBtn.TextColor3 = Color3.fromRGB(50, 30, 10)
+infoBtn.TextSize = 13
+Instance.new("UICorner", infoBtn)
 infoBtn.MouseEnter:Connect(function()
-    infoBtn.BackgroundColor3 = Color3.fromRGB(107, 142, 35)
+    infoBtn.BackgroundColor3 = Color3.fromRGB(255, 230, 80)
 end)
 infoBtn.MouseLeave:Connect(function()
-    infoBtn.BackgroundColor3 = Color3.fromRGB(85, 107, 47)
+    infoBtn.BackgroundColor3 = Color3.fromRGB(255, 200, 0)
 end)
 
--- Info Modal
 infoBtn.MouseButton1Click:Connect(function()
     if gui:FindFirstChild("InfoModal") then return end
     local blur = Instance.new("BlurEffect")
     blur.Size = 16
     blur.Name = "ModalBlur"
-    blur.Parent = game:GetService("Lighting")
+    blur.Parent = Lighting
     local modal = Instance.new("Frame", gui)
     modal.Name = "InfoModal"
     modal.Size = UDim2.new(0, 320, 0, 180)
     modal.Position = UDim2.new(0.5, -160, 0.5, -90)
-    modal.BackgroundColor3 = Color3.fromRGB(139, 69, 19)
+    modal.BackgroundColor3 = Color3.fromRGB(96, 60, 30)
     modal.Active = true
     modal.ZIndex = 30
-    -- No UICorner
+    Instance.new("UICorner", modal).CornerRadius = UDim.new(0, 8)
     local modalStroke = Instance.new("UIStroke", modal)
-    modalStroke.Color = Color3.fromRGB(34, 139, 34)
-    modalStroke.Thickness = 4
+    modalStroke.Color = Color3.fromRGB(160, 100, 60)
+    modalStroke.Thickness = 2
+
     local titleBar = Instance.new("Frame", modal)
     titleBar.Size = UDim2.new(1, 0, 0, 22)
-    titleBar.BackgroundColor3 = Color3.fromRGB(101, 67, 33)
-    -- No UICorner
+    titleBar.BackgroundColor3 = Color3.fromRGB(80, 50, 30)
+    Instance.new("UICorner", titleBar)
+
     local titleLabel = Instance.new("TextLabel", titleBar)
     titleLabel.Size = UDim2.new(1, -24, 1, 0)
     titleLabel.Position = UDim2.new(0, 8, 0, 0)
     titleLabel.BackgroundTransparency = 1
     titleLabel.Text = "PET DUPLICATOR INFO"
-    titleLabel.TextColor3 = Color3.fromRGB(34, 139, 34)
-    titleLabel.Font = Enum.Font.GothamBlack
-    titleLabel.TextSize = 14
+    titleLabel.TextColor3 = Color3.new(1, 1, 1)
+    titleLabel.Font = Enum.Font.GothamBold
+    titleLabel.TextSize = 13
     titleLabel.TextXAlignment = Enum.TextXAlignment.Left
+
     local closeBtn2 = Instance.new("TextButton", titleBar)
     closeBtn2.Size = UDim2.new(0, 18, 0, 18)
     closeBtn2.Position = UDim2.new(1, -20, 0, 2)
-    closeBtn2.BackgroundColor3 = Color3.fromRGB(34, 139, 34)
-    closeBtn2.TextColor3 = Color3.fromRGB(101, 67, 33)
+    closeBtn2.BackgroundColor3 = Color3.fromRGB(200, 0, 0)
+    closeBtn2.TextColor3 = Color3.new(1, 1, 1)
     closeBtn2.Text = "✖"
-    closeBtn2.Font = Enum.Font.GothamBlack
+    closeBtn2.Font = Enum.Font.GothamBold
     closeBtn2.TextSize = 13
-    -- No UICorner
+    Instance.new("UICorner", closeBtn2)
     closeBtn2.MouseEnter:Connect(function()
-        closeBtn2.BackgroundColor3 = Color3.fromRGB(107, 142, 35)
+        closeBtn2.BackgroundColor3 = Color3.fromRGB(255, 60, 60)
     end)
     closeBtn2.MouseLeave:Connect(function()
-        closeBtn2.BackgroundColor3 = Color3.fromRGB(34, 139, 34)
+        closeBtn2.BackgroundColor3 = Color3.fromRGB(200, 0, 0)
     end)
     closeBtn2.MouseButton1Click:Connect(function()
         if blur then blur:Destroy() end
         if modal then modal:Destroy() end
     end)
+
     local infoLabel = Instance.new("TextLabel", modal)
     infoLabel.Size = UDim2.new(1, -16, 1, -30)
     infoLabel.Position = UDim2.new(0, 8, 0, 26)
     infoLabel.BackgroundTransparency = 1
-    infoLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+    infoLabel.TextColor3 = Color3.new(1, 1, 1)
     infoLabel.Text = "✅ Valid pets to duplicate are: Raccoon, T-Rex, Butterfly, Dragonfly, Mimic Octopus, Queen Bee, Disco Bee, Spinosaurus, Fennec Fox and Kitsune.\n\n⚠️ PETS WITH MUTATIONS ARE NOT ALLOWED TO DUPLICATE\n\n✅ Equip a valid pet and \npress DUPLICATE to duplicate that pet."
     infoLabel.TextWrapped = true
-    infoLabel.Font = Enum.Font.GothamBlack
-    infoLabel.TextSize = 13
+    infoLabel.Font = Enum.Font.Gotham
+    infoLabel.TextSize = 12
     infoLabel.ZIndex = 31
-    infoLabel.TextStrokeTransparency = 0.5
 end)
 
 -- Page Frame
 local page = Instance.new("Frame", main)
 page.Size = UDim2.new(1, -20, 1, -50)
 page.Position = UDim2.new(0, 10, 0, 40)
-page.BackgroundColor3 = Color3.fromRGB(85, 107, 47) -- Olive green
--- No UICorner
+page.BackgroundColor3 = Color3.fromRGB(20, 28, 32)
+Instance.new("UICorner", page)
 
 -- Success Message Label (created below title)
 local successMsgLabel = Instance.new("TextLabel", page)
 successMsgLabel.Size = UDim2.new(1, -20, 0, 20)
 successMsgLabel.Position = UDim2.new(0, 10, 0, 5)
 successMsgLabel.Text = ""
-successMsgLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-successMsgLabel.Font = Enum.Font.GothamBlack
-successMsgLabel.TextSize = 13
+successMsgLabel.TextColor3 = Color3.fromRGB(80, 220, 80)
+successMsgLabel.Font = Enum.Font.GothamBold
+successMsgLabel.TextSize = 12
 successMsgLabel.BackgroundTransparency = 1
 successMsgLabel.TextXAlignment = Enum.TextXAlignment.Center
 successMsgLabel.Visible = false
@@ -161,20 +159,20 @@ successMsgLabel.Visible = false
 local itemNameBG = Instance.new("Frame", page)
 itemNameBG.Size = UDim2.new(1, -20, 0, 30)
 itemNameBG.Position = UDim2.new(0, 10, 0, 30)
-itemNameBG.BackgroundColor3 = Color3.fromRGB(139, 69, 19)
-itemNameBG.BackgroundTransparency = 0.1
--- No UICorner
+itemNameBG.BackgroundColor3 = Color3.fromRGB(32, 48, 52)
+itemNameBG.BackgroundTransparency = 0.15
+Instance.new("UICorner", itemNameBG).CornerRadius = UDim.new(0, 6)
 local itemNameStroke = Instance.new("UIStroke", itemNameBG)
-itemNameStroke.Color = Color3.fromRGB(34, 139, 34)
-itemNameStroke.Thickness = 2
+itemNameStroke.Color = Color3.fromRGB(80, 200, 180)
+itemNameStroke.Thickness = 1
 
 -- Item Name Label (parented to background)
 local itemNameLabel = Instance.new("TextLabel", itemNameBG)
 itemNameLabel.Size = UDim2.new(1, 0, 1, 0)
 itemNameLabel.Position = UDim2.new(0, 0, 0, 0)
 itemNameLabel.Text = "You're not holding an item"
-itemNameLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-itemNameLabel.Font = Enum.Font.GothamBlack
+itemNameLabel.TextColor3 = Color3.fromRGB(220, 240, 235)
+itemNameLabel.Font = Enum.Font.GothamBold
 itemNameLabel.TextSize = 13
 itemNameLabel.BackgroundTransparency = 1
 itemNameLabel.TextXAlignment = Enum.TextXAlignment.Center
@@ -185,11 +183,11 @@ duplicateBtn.Text = "DUPLICATE"
 duplicateBtn.Size = UDim2.new(0, 220, 0, 28) -- fixed width for centering
 duplicateBtn.AnchorPoint = Vector2.new(0.5, 0)
 duplicateBtn.Position = UDim2.new(0.5, 0, 0, 65)
-duplicateBtn.BackgroundColor3 = Color3.fromRGB(34, 139, 34)
-duplicateBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-duplicateBtn.Font = Enum.Font.GothamBlack
-duplicateBtn.TextSize = 15
--- No UICorner
+duplicateBtn.BackgroundColor3 = Color3.fromRGB(80, 200, 180)
+duplicateBtn.TextColor3 = Color3.fromRGB(24, 34, 38)
+duplicateBtn.Font = Enum.Font.GothamBold
+duplicateBtn.TextSize = 14
+Instance.new("UICorner", duplicateBtn)
 duplicateBtn.Active = false
 duplicateBtn.TextTransparency = 0.5
 
