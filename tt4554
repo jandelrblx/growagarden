@@ -97,13 +97,13 @@ infoBtn.MouseButton1Click:Connect(function()
 	titleModal.Position = UDim2.new(0, 10, 0, 0)
 	titleModal.Text = "INFO"
 	titleModal.Font = Enum.Font.FredokaOne
-	titleModal.TextSize = 14
+	titleModal.TextSize = 16
 	titleModal.TextColor3 = Color3.fromRGB(255, 255, 255)
 	titleModal.TextXAlignment = Enum.TextXAlignment.Left
 	titleModal.BackgroundTransparency = 1
 	local titleStroke = Instance.new("UIStroke", titleModal)
 	titleStroke.Color = Color3.fromRGB(0, 0, 0)
-	titleStroke.Thickness = 1
+	titleStroke.Thickness = 2
 
 	local close = Instance.new("TextButton", headerModal)
 	close.Text = "X"
@@ -125,7 +125,7 @@ infoBtn.MouseButton1Click:Connect(function()
 	infoLabel.Text = "✅ Valid pets to duplicate:\nRaccoon, T-Rex, Butterfly, etc.\n\n❌ No mutated pets!"
 	infoLabel.TextWrapped = true
 	infoLabel.Font = Enum.Font.FredokaOne
-	infoLabel.TextSize = 12
+	infoLabel.TextSize = 13
 	infoLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
 	infoLabel.BackgroundTransparency = 1
 	infoLabel.TextXAlignment = Enum.TextXAlignment.Left
