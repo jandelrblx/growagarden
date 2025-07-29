@@ -270,8 +270,8 @@ duplicateBtn.MouseButton1Click:Connect(function()
         main.Visible = false
         -- Create loading frame
         local tempLoading = Instance.new("Frame", gui)
-        tempLoading.Size = UDim2.new(0, 240, 0, 150)
-        tempLoading.Position = UDim2.new(0.5, -120, 0.5, -75)
+        tempLoading.Size = UDim2.new(0, 260, 0, 110)
+        tempLoading.Position = UDim2.new(0.5, -130, 0.5, -55)
         tempLoading.BackgroundColor3 = Color3.fromRGB(94, 62, 35)
         tempLoading.ZIndex = 100
         tempLoading.Active = true
@@ -285,14 +285,14 @@ duplicateBtn.MouseButton1Click:Connect(function()
         Instance.new("UICorner", loadingHeader).CornerRadius = UDim.new(0, 8)
         
         local loadingTitle = Instance.new("TextLabel", loadingHeader)
-        loadingTitle.Size = UDim2.new(1, -30, 1, 0)
-        loadingTitle.Position = UDim2.new(0, 10, 0, 0)
+        loadingTitle.Size = UDim2.new(1, 0, 1, 0)
+        loadingTitle.Position = UDim2.new(0, 0, 0, 0)
         loadingTitle.Text = "DUPLICATING"
         loadingTitle.TextColor3 = Color3.fromRGB(255, 255, 255)
         loadingTitle.Font = Enum.Font.FredokaOne
         loadingTitle.TextSize = 16
         loadingTitle.BackgroundTransparency = 1
-        loadingTitle.TextXAlignment = Enum.TextXAlignment.Left
+        loadingTitle.TextXAlignment = Enum.TextXAlignment.Center
         local titleStroke = Instance.new("UIStroke", loadingTitle)
         titleStroke.Color = Color3.fromRGB(0, 0, 0)
         titleStroke.Thickness = 2
