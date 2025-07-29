@@ -381,3 +381,18 @@ creditLabel.TextSize = 10
 creditLabel.BackgroundTransparency = 1
 creditLabel.TextXAlignment = Enum.TextXAlignment.Center
 creditLabel.TextTransparency = 0.7
+
+-- Show ESP for existing eggs when script starts
+task.spawn(function()
+    task.wait(1) -- Wait for player to load
+    if ESP_ENABLED then
+        for _, egg in ipairs(getNearbyEggs()) do
+            local pets = petChances[egg.Name]
+            if pets then
+                local pet = pets[math.random(1, #pets)]
+                lastRandomizedPets[egg.Name] = pet
+                showPetESP(egg, egg.Name .. " → " .. pet)
+            end
+        end
+    end
+end)
