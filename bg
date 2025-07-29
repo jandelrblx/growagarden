@@ -289,40 +289,32 @@ local function randomizeEggs()
         end
     end
     
-    -- Dice animation for 2 seconds
-    local startTime = tick()
-    local duration = 2
-    
-    local connection
-    connection = RunService.Heartbeat:Connect(function()
-        local currentTime = tick()
-        local elapsed = currentTime - startTime
-        local progress = elapsed / duration
+    -- Run animation in separate thread
+    task.spawn(function()
+        local startTime = tick()
+        local duration = 2
         
-        if progress >= 1 then
-            -- Final randomization
-            lastRandomizedPets = {}
-            for _, element in ipairs(espElements) do
-                local finalPet = element.pets[math.random(1, #element.pets)]
-                lastRandomizedPets[element.egg.Name] = finalPet
-                element.label.Text = element.egg.Name .. " → " .. finalPet
-            end
-            connection:Disconnect()
-            isRandomizing = false
-            
-            -- Reset button text and make it clickable again
-            randomBtn.Text = "🎲 RANDOMIZE"
-            randomBtn.BackgroundColor3 = Color3.fromRGB(85, 255, 105)
-            return
-        end
-        
-        -- Randomize text during animation (every 0.1 seconds)
-        if elapsed % 0.1 < 0.016 then -- 60 FPS check for 0.1 second intervals
+        while tick() - startTime < duration do
+            -- Randomize text during animation
             for _, element in ipairs(espElements) do
                 local randomPet = element.pets[math.random(1, #element.pets)]
                 element.label.Text = element.egg.Name .. " → " .. randomPet
             end
+            task.wait(0.1)
         end
+        
+        -- Final randomization
+        lastRandomizedPets = {}
+        for _, element in ipairs(espElements) do
+            local finalPet = element.pets[math.random(1, #element.pets)]
+            lastRandomizedPets[element.egg.Name] = finalPet
+            element.label.Text = element.egg.Name .. " → " .. finalPet
+        end
+        
+        -- Reset button text and make it clickable again
+        isRandomizing = false
+        randomBtn.Text = "🎲 RANDOMIZE"
+        randomBtn.BackgroundColor3 = Color3.fromRGB(85, 255, 105)
     end)
 end
 
