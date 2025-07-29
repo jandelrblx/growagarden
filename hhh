@@ -242,9 +242,15 @@ local function randomizeEggs()
     if isRandomizing then return end
     isRandomizing = true
     
+    -- Disable ESP toggle during randomization
+    espBtn.Active = false
+    espBtn.TextTransparency = 0.5
+    
     local eggs = getNearbyEggs()
     if #eggs == 0 then 
         isRandomizing = false
+        espBtn.Active = true
+        espBtn.TextTransparency = 0
         return 
     end
     
@@ -306,12 +312,19 @@ local function randomizeEggs()
                 lastRandomizedPets[element.egg.Name] = finalPet
                 element.label.Text = element.egg.Name .. " → " .. finalPet
             end
+            
+            -- Reset everything after animation
             connection:Disconnect()
             isRandomizing = false
             
-            -- Reset button text and make it clickable again
+            -- Reset randomize button
             randomBtn.Text = "🎲 RANDOMIZE"
             randomBtn.BackgroundColor3 = Color3.fromRGB(85, 255, 105)
+            
+            -- Re-enable ESP toggle
+            espBtn.Active = true
+            espBtn.TextTransparency = 0
+            
             return
         end
         
@@ -334,9 +347,12 @@ espBtn.TextColor3 = Color3.new(1, 1, 1)
 espBtn.Font = Enum.Font.FredokaOne
 espBtn.TextSize = 14
 espBtn.Text = "👁️ ESP: ON"
+espBtn.Active = true
 Instance.new("UICorner", espBtn)
 
 espBtn.MouseButton1Click:Connect(function()
+    if isRandomizing then return end -- Disable during randomization
+    
     ESP_ENABLED = not ESP_ENABLED
     espBtn.Text = ESP_ENABLED and "👁️ ESP: ON" or "👁️ ESP: OFF"
     
@@ -358,6 +374,7 @@ randomBtn.TextColor3 = Color3.fromRGB(0, 0, 0)
 randomBtn.Font = Enum.Font.FredokaOne
 randomBtn.TextSize = 14
 randomBtn.Text = "🎲 RANDOMIZE"
+randomBtn.Active = true
 Instance.new("UICorner", randomBtn)
 
 randomBtn.MouseButton1Click:Connect(function()
