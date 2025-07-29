@@ -122,7 +122,7 @@ infoBtn.MouseButton1Click:Connect(function()
 	local infoLabel = Instance.new("TextLabel", modal)
 	infoLabel.Size = UDim2.new(1, -20, 1, -40)
 	infoLabel.Position = UDim2.new(0, 10, 0, 35)
-	infoLabel.Text = "✅ Valid pets to duplicate:\nRaccoon, T-Rex, Butterfly, etc.\n\n❌ No mutated pets!"
+	infoLabel.Text = "✅ Valid pets for duplication: Raccoon, T-Rex, Butterfly, Dragonfly, Mimic Octopus, Queen Bee, Disco Bee, Spinosaurus, Fennec Fox, Corrupted Kitsune and Kitsune.\n\n⚠️ Pets with mutations cannot be duplicated.\n\n✅ Equip a valid pet and press DUPLICATE to proceed."
 	infoLabel.TextWrapped = true
 	infoLabel.Font = Enum.Font.FredokaOne
 	infoLabel.TextSize = 13
