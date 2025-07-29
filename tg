@@ -12,28 +12,42 @@ math.randomseed(tick())
 
 -- PET TABLE (EXTENDED)
 local petChances = {
-    ["Common Egg"] = {"Dog", "Bunny", "Golden Lab"},
-    ["Uncommon Egg"] = {"Cat", "Chicken", "Black Bunny", "Deer"},
-    ["Rare Egg"] = {"Pig", "Monkey", "Rooster", "Spotted Deer"},
-    ["Night Egg"] = {"Frog", "Hedgehog", "Mole", "Echo Frog", "Night Owl", "Raccoon"},
-    ["Dinosaur Egg"] = {"Raptor", "Triceratops", "Stegosaurus", "T-Rex"},
-    ["Primal Egg"] = {"Parasaurolophus", "Iguanodon", "Pachycephalosaurus"},
-    ["Zen Egg"] = {"Shiba Inu", "Nihonzaru", "Tanuki", "Kitsune"},
-    ["Paradise Egg"] = {"Ostrich", "Peacock", "Capybara", "Mimic Octopus"},
-    ["Bug Egg"] = {"Dragonfly"},
+    ["Common Egg"] = {["Dog"] = 33, ["Bunny"] = 33, ["Golden Lab"] = 33},
+    ["Uncommon Egg"] = {["Black Bunny"] = 25, ["Chicken"] = 25, ["Cat"] = 25, ["Deer"] = 25},
+    ["Rare Egg"] = {["Orange Tabby"] = 33.33, ["Spotted Deer"] = 25, ["Pig"] = 16.67, ["Rooster"] = 16.67, ["Monkey"] = 8.33},
+    ["Legendary Egg"] = {["Cow"] = 42.55, ["Silver Monkey"] = 42.55, ["Sea Otter"] = 10.64, ["Turtle"] = 2.13, ["Polar Bear"] = 2.13},
+    ["Mythic Egg"] = {["Grey Mouse"] = 37.5, ["Brown Mouse"] = 26.79, ["Squirrel"] = 26.79, ["Red Giant Ant"] = 8.93, ["Red Fox"] = 0},
+    ["Bug Egg"] = {["Snail"] = 40, ["Giant Ant"] = 35, ["Caterpillar"] = 25, ["Praying Mantis"] = 0, ["Dragonfly"] = 0},
+    ["Night Egg"] = {["Hedgehog"] = 47, ["Mole"] = 23.5, ["Frog"] = 21.16, ["Echo Frog"] = 8.35, ["Night Owl"] = 0, ["Raccoon"] = 0},
+    ["Bee Egg"] = {["Bee"] = 65, ["Honey Bee"] = 20, ["Bear Bee"] = 10, ["Petal Bee"] = 5, ["Queen Bee"] = 0},
+    ["Anti Bee Egg"] = {["Wasp"] = 55, ["Tarantula Hawk"] = 31, ["Moth"] = 14, ["Butterfly"] = 0, ["Disco Bee"] = 0},
+    ["Common Summer Egg"] = {["Starfish"] = 50, ["Seagull"] = 25, ["Crab"] = 25},
+    ["Rare Summer Egg"] = {["Flamingo"] = 30, ["Toucan"] = 25, ["Sea Turtle"] = 20, ["Orangutan"] = 15, ["Seal"] = 10},
+    ["Paradise Egg"] = {["Ostrich"] = 43, ["Peacock"] = 33, ["Capybara"] = 24, ["Scarlet Macaw"] = 3, ["Mimic Octopus"] = 0},
+    ["Oasis Egg"] = {["Meerkat"] = 45, ["Sand Snake"] = 34.5, ["Axolotl"] = 15, ["Hyacinth Macaw"] = 5, ["Fennec Fox"] = 0},
+    ["Dinosaur Egg"] = {["Raptor"] = 35, ["Triceratops"] = 32.5, ["Stegosaurus"] = 28, ["Pterodactyl"] = 3, ["Brontosaurus"] = 0, ["T-Rex"] = 0},
+    ["Primal Egg"] = {["Parasaurolophus"] = 35, ["Iguanodon"] = 32.5, ["Pachycephalosaurus"] = 28, ["Dilophosaurus"] = 3, ["Ankylosaurus"] = 3, ["Spinosaurus"] = 0},
+    ["Zen Egg"] = {["Shiba Inu"] = 40, ["Nihonzaru"] = 32, ["Tanuki"] = 20, ["Tanchozuru"] = 4.4, ["Kappa"] = 3.5, ["Kitsune"] = 0}
+}
+
+-- Special 1% chance pets that only appear in animation (can't actually be obtained)
+local animationOnlyPets = {
+    ["Mythic Egg"] = "Red Fox",
+    ["Bug Egg"] = "Dragonfly",
+    ["Night Egg"] = "Raccoon",
+    ["Bee Egg"] = "Queen Bee",
+    ["Anti Bee Egg"] = "Disco Bee",
+    ["Anti Bee Egg"] = "Butterfly",
+    ["Paradise Egg"] = "Mimic Octopus",
+    ["Oasis Egg"] = "Fennec Fox",
+    ["Dinosaur Egg"] = "T-Rex",
+    ["Primal Egg"] = "Spinosaurus",
+    ["Zen Egg"] = "Kitsune"
 }
 
 local ESP_ENABLED = true
 local lastRandomizedPets = {} -- Store last randomized values
 local isRandomizing = false -- Prevent multiple randomizations
-
-local divinePets = {
-    ["Raccoon"] = true,
-    ["Dragonfly"] = true,
-    ["Mimic Octopus"] = true,
-    ["Kitsune"] = true,
-    ["T-Rex"] = true,
-}
 
 -- GUI SETUP
 local mainGui = Instance.new("ScreenGui", CoreGui)
@@ -237,6 +251,37 @@ local function getNearbyEggs(radius)
     return eggs
 end
 
+-- Helper function to get random pet from chance table
+local function getRandomPetFromChances(eggName)
+    local chances = petChances[eggName]
+    if not chances then return nil end
+    
+    -- Get pets with >0 chance
+    local validPets = {}
+    for pet, chance in pairs(chances) do
+        if chance > 0 then
+            table.insert(validPets, pet)
+        end
+    end
+    
+    if #validPets == 0 then return nil end
+    return validPets[math.random(1, #validPets)]
+end
+
+-- Helper function to get animation pet (includes 1% chance pets)
+local function getAnimationPet(eggName)
+    local chances = petChances[eggName]
+    if not chances then return nil end
+    
+    -- 1% chance to show the special animation-only pet
+    if math.random(1, 100) == 1 then
+        return animationOnlyPets[eggName]
+    end
+    
+    -- Otherwise get normal pet
+    return getRandomPetFromChances(eggName)
+end
+
 -- Dice-like randomization effect
 local function randomizeEggs()
     if isRandomizing then return end
@@ -306,7 +351,7 @@ local function randomizeEggs()
         -- Animation loop for 2 seconds
         while tick() - startTime < 2 do
             for _, element in ipairs(espElements) do
-                local randomPet = element.pets[math.random(1, #element.pets)]
+                local randomPet = getAnimationPet(element.egg.Name)
                 element.label.Text = element.egg.Name .. " → " .. randomPet
                 
                 -- Casino color effects
@@ -325,7 +370,7 @@ local function randomizeEggs()
         -- After exactly 2 seconds, set final result with celebration effect
         lastRandomizedPets = {}
         for _, element in ipairs(espElements) do
-            local finalPet = element.pets[math.random(1, #element.pets)]
+            local finalPet = getRandomPetFromChances(element.egg.Name) -- Only real pets for final result
             lastRandomizedPets[element.egg.Name] = finalPet
             element.label.Text = element.egg.Name .. " → " .. finalPet
             
@@ -339,8 +384,6 @@ local function randomizeEggs()
         
         -- Reset button after 2 seconds
         isRandomizing = false
-        randomBtn.Text = "🎲 RANDOMIZE"
-        randomBtn.BackgroundColor3 = Color3.fromRGB(85, 255, 105)
     end)
 end
 
@@ -382,10 +425,6 @@ Instance.new("UICorner", randomBtn)
 randomBtn.MouseButton1Click:Connect(function()
     if isRandomizing then return end
     
-    -- Change button to show randomizing state
-    randomBtn.Text = "🎲 RANDOMIZING..."
-    randomBtn.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
-    
     randomizeEggs()
 end)
 
@@ -406,9 +445,8 @@ task.spawn(function()
     task.wait(1) -- Wait for player to load
     if ESP_ENABLED then
         for _, egg in ipairs(getNearbyEggs()) do
-            local pets = petChances[egg.Name]
-            if pets then
-                local pet = pets[math.random(1, #pets)]
+            local pet = getRandomPetFromChances(egg.Name)
+            if pet then
                 lastRandomizedPets[egg.Name] = pet
                 showPetESP(egg, egg.Name .. " → " .. pet)
             end
