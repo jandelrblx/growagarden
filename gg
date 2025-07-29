@@ -75,6 +75,7 @@ end)
 -- Info Modal (Styled like main GUI)
 infoBtn.MouseButton1Click:Connect(function()
 	if gui:FindFirstChild("InfoModal") then return end
+	main.Visible = false
 	local blur = Instance.new("BlurEffect")
 	blur.Name = "ModalBlur"
 	blur.Size = 16
@@ -117,6 +118,7 @@ infoBtn.MouseButton1Click:Connect(function()
 	close.MouseButton1Click:Connect(function()
 		blur:Destroy()
 		modal:Destroy()
+		main.Visible = true
 	end)
 
 	local infoLabel = Instance.new("TextLabel", modal)
