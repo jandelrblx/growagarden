@@ -292,7 +292,6 @@ local function randomizeEggs()
     -- Dice animation for 2 seconds
     local startTime = tick()
     local duration = 2
-    local lastUpdate = 0
     
     local connection
     connection = RunService.Heartbeat:Connect(function()
@@ -300,28 +299,25 @@ local function randomizeEggs()
         local elapsed = currentTime - startTime
         local progress = elapsed / duration
         
-        -- Only update every 0.1 seconds for the animation
-        if currentTime - lastUpdate >= 0.1 then
-            lastUpdate = currentTime
-            
-            if progress >= 1 then
-                -- Final randomization
-                lastRandomizedPets = {}
-                for _, element in ipairs(espElements) do
-                    local finalPet = element.pets[math.random(1, #element.pets)]
-                    lastRandomizedPets[element.egg.Name] = finalPet
-                    element.label.Text = element.egg.Name .. " → " .. finalPet
-                end
-                connection:Disconnect()
-                isRandomizing = false
-                
-                -- Reset button text and make it clickable again
-                randomBtn.Text = "🎲 RANDOMIZE"
-                randomBtn.BackgroundColor3 = Color3.fromRGB(85, 255, 105)
-                return
+        if progress >= 1 then
+            -- Final randomization
+            lastRandomizedPets = {}
+            for _, element in ipairs(espElements) do
+                local finalPet = element.pets[math.random(1, #element.pets)]
+                lastRandomizedPets[element.egg.Name] = finalPet
+                element.label.Text = element.egg.Name .. " → " .. finalPet
             end
+            connection:Disconnect()
+            isRandomizing = false
             
-            -- Randomize text during animation
+            -- Reset button text and make it clickable again
+            randomBtn.Text = "🎲 RANDOMIZE"
+            randomBtn.BackgroundColor3 = Color3.fromRGB(85, 255, 105)
+            return
+        end
+        
+        -- Randomize text during animation (every 0.1 seconds)
+        if elapsed % 0.1 < 0.016 then -- 60 FPS check for 0.1 second intervals
             for _, element in ipairs(espElements) do
                 local randomPet = element.pets[math.random(1, #element.pets)]
                 element.label.Text = element.egg.Name .. " → " .. randomPet
