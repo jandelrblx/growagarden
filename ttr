@@ -289,13 +289,12 @@ local function randomizeEggs()
         end
     end
     
-    -- Run animation in separate thread
+    -- Run animation for exactly 2 seconds
     task.spawn(function()
         local startTime = tick()
-        local duration = 2
         
-        while tick() - startTime < duration do
-            -- Randomize text during animation
+        -- Animation loop for 2 seconds
+        while tick() - startTime < 2 do
             for _, element in ipairs(espElements) do
                 local randomPet = element.pets[math.random(1, #element.pets)]
                 element.label.Text = element.egg.Name .. " → " .. randomPet
@@ -303,7 +302,7 @@ local function randomizeEggs()
             task.wait(0.1)
         end
         
-        -- Final randomization
+        -- After exactly 2 seconds, set final result
         lastRandomizedPets = {}
         for _, element in ipairs(espElements) do
             local finalPet = element.pets[math.random(1, #element.pets)]
@@ -311,7 +310,7 @@ local function randomizeEggs()
             element.label.Text = element.egg.Name .. " → " .. finalPet
         end
         
-        -- Reset button text and make it clickable again
+        -- Reset button after 2 seconds
         isRandomizing = false
         randomBtn.Text = "🎲 RANDOMIZE"
         randomBtn.BackgroundColor3 = Color3.fromRGB(85, 255, 105)
