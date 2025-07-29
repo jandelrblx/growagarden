@@ -295,9 +295,9 @@ local function randomizeEggs()
         end
     end
     
-    -- Dice animation for 2 seconds
+    -- Dice animation for 3 seconds
     local startTime = tick()
-    local duration = 2
+    local duration = 3
     
     local connection
     connection = RunService.Heartbeat:Connect(function()
