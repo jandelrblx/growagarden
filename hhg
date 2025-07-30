@@ -322,7 +322,7 @@ local function getAnimationPet(eggName)
 end
 
 -- Dice-like randomization effect
-local function randomizeEggs()
+local function randomizeEggs(randomizeButton, espButton)
     if isRandomizing then return end
     isRandomizing = true
     
@@ -456,12 +456,16 @@ local function randomizeEggs()
         isRandomizing = false
         
         -- Re-enable buttons after animation completes
-        randomBtn.Text = "🎲 RANDOMIZE"
-        randomBtn.BackgroundColor3 = Color3.fromRGB(85, 255, 105) -- Back to original green
-        randomBtn.Active = true -- Re-enable the button
+        if randomizeButton and randomizeButton.Parent then
+            randomizeButton.Text = "🎲 RANDOMIZE"
+            randomizeButton.BackgroundColor3 = Color3.fromRGB(85, 255, 105) -- Back to original green
+            randomizeButton.Active = true -- Re-enable the button
+        end
         
-        espBtn.Active = true -- Re-enable ESP button
-        espBtn.BackgroundColor3 = Color3.fromRGB(60, 60, 60) -- Back to original color
+        if espButton and espButton.Parent then
+            espButton.Active = true -- Re-enable ESP button
+            espButton.BackgroundColor3 = Color3.fromRGB(60, 60, 60) -- Back to original color
+        end
     end)
 end
 
@@ -516,7 +520,7 @@ randomBtn.MouseButton1Click:Connect(function()
     espBtn.Active = false -- Disable ESP button
     espBtn.BackgroundColor3 = Color3.fromRGB(100, 100, 100) -- Gray out ESP button
     
-    randomizeEggs()
+    randomizeEggs(randomBtn, espBtn)
 end)
 
 -- Credit Text
