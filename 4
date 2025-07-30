@@ -430,9 +430,9 @@ randomBtn.MouseButton1Click:Connect(function()
     
     randomizeEggs()
     
-    -- Reset button after 3 seconds
+    -- Reset button after 2 seconds
     task.spawn(function()
-        task.wait(3)
+        task.wait(2)
         randomBtn.Text = "🎲 RANDOMIZE"
         randomBtn.BackgroundColor3 = Color3.fromRGB(85, 255, 105) -- Back to original green
     end)
