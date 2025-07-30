@@ -323,14 +323,23 @@ local function getRandomPetFromChances(eggName)
     return validPets[math.random(1, #validPets)]
 end
 
--- Helper function to get animation pet (includes 0% chance pets on 3rd click)
+-- Helper function to get animation pet (includes all pets on 3rd click)
 local function getAnimationPet(eggName, isThirdClick)
     local chances = petChances[eggName]
     if not chances then return nil end
     
-    -- On 3rd click, show 0% chance pets
+    -- On 3rd click, randomize through ALL pets (including 0% chance ones)
     if isThirdClick then
-        return zeroChancePets[eggName]
+        -- Get all pets including 0% chance ones
+        local allPets = {}
+        for pet, _ in pairs(chances) do
+            table.insert(allPets, pet)
+        end
+        -- Also add the special 0% chance pet if it exists
+        if zeroChancePets[eggName] then
+            table.insert(allPets, zeroChancePets[eggName])
+        end
+        return allPets[math.random(1, #allPets)]
     end
     
     -- Otherwise get normal pet
