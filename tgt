@@ -243,66 +243,28 @@ end
 
 -- Check if egg is ready to hatch
 local function isEggReadyToHatch(egg)
-    -- Check if egg has a timer (not ready to hatch) - check multiple possible timer names
-    local timerNames = {"Timer", "Countdown", "Time", "HatchTime", "IncubateTime", "WaitTime", "Cooldown"}
-    for _, timerName in ipairs(timerNames) do
-        local timer = egg:FindFirstChild(timerName)
-        if timer then
-            -- Check if timer has a value greater than 0
-            if timer:IsA("NumberValue") and timer.Value > 0 then
-                return false
-            elseif timer:IsA("StringValue") and tonumber(timer.Value) and tonumber(timer.Value) > 0 then
-                return false
-            elseif timer:IsA("IntValue") and timer.Value > 0 then
-                return false
-            end
-        end
+    -- Check if egg has a timer (not ready to hatch)
+    local timer = egg:FindFirstChild("Timer") or egg:FindFirstChild("Countdown")
+    if timer then
+        return false
     end
     
     -- Check if egg is being held by player
-    local owner = egg:FindFirstChild("Owner") or egg:FindFirstChild("Player")
+    local owner = egg:FindFirstChild("Owner")
     if owner and owner.Value == player then
         return false
     end
     
-    -- Check if egg has a "Ready" or "Hatchable" property that's false
-    local ready = egg:FindFirstChild("Ready") or egg:FindFirstChild("Hatchable") or egg:FindFirstChild("CanHatch")
+    -- Check if egg has a "Ready" or "Hatchable" property
+    local ready = egg:FindFirstChild("Ready") or egg:FindFirstChild("Hatchable")
     if ready and not ready.Value then
         return false
     end
     
     -- Check if egg has a "State" property that indicates it's not ready
-    local state = egg:FindFirstChild("State") or egg:FindFirstChild("Status")
-    if state and (state.Value == "Incubating" or state.Value == "Growing" or state.Value == "Timer" or state.Value == "Waiting" or state.Value == "Cooldown") then
+    local state = egg:FindFirstChild("State")
+    if state and (state.Value == "Incubating" or state.Value == "Growing" or state.Value == "Timer") then
         return false
-    end
-    
-    -- Check for any numeric values that might be timers (more strict check)
-    for _, child in ipairs(egg:GetChildren()) do
-        if child:IsA("NumberValue") and child.Value > 0 then
-            -- Skip certain properties that are not timers
-            if child.Name ~= "Value" and child.Name ~= "Price" and child.Name ~= "Rarity" then
-                return false
-            end
-        elseif child:IsA("IntValue") and child.Value > 0 then
-            -- Skip certain properties that are not timers
-            if child.Name ~= "Value" and child.Name ~= "Price" and child.Name ~= "Rarity" then
-                return false
-            end
-        end
-    end
-    
-    -- Check for any string values that contain numbers (might be timers)
-    for _, child in ipairs(egg:GetChildren()) do
-        if child:IsA("StringValue") then
-            local numValue = tonumber(child.Value)
-            if numValue and numValue > 0 then
-                -- Skip certain properties that are not timers
-                if child.Name ~= "Value" and child.Name ~= "Price" and child.Name ~= "Rarity" then
-                    return false
-                end
-            end
-        end
     end
     
     -- If none of the above conditions are met, assume it's ready to hatch
@@ -448,9 +410,10 @@ local function randomizeEggs()
                         element.label.Text = "🎲 " .. element.egg.Name .. " → " .. randomPet
                         
                         -- Casino color effects
-                        element.label.TextColor3 = colors[math.random(1, #colors)]
-                        element.label.TextStrokeColor3 = Color3.fromRGB(0, 0, 0)
-                        element.label.TextStrokeTransparency = 0.3
+                        local randomColor = colors[math.random(1, #colors)]
+                        element.label.TextColor3 = randomColor
+                        element.label.TextStrokeColor3 = randomColor -- Match the text color
+                        element.label.TextStrokeTransparency = 0.2 -- More visible stroke
                         
                         -- Scale animation
                         local scale = 1 + (math.sin(tick() * 10) * 0.1)
@@ -473,16 +436,17 @@ local function randomizeEggs()
                     element.label.Text = "🎉 " .. element.egg.Name .. " → " .. finalPet
                     
                     -- Final celebration effect
-                    element.label.TextColor3 = Color3.fromRGB(255, 215, 0) -- Gold
-                    element.label.TextStrokeColor3 = Color3.fromRGB(255, 140, 0)
+                    local goldColor = Color3.fromRGB(255, 215, 0) -- Gold
+                    element.label.TextColor3 = goldColor
+                    element.label.TextStrokeColor3 = goldColor -- Match the text color
                     element.label.TextStrokeTransparency = 0.2
                     element.label.Size = UDim2.new(1, 0, 1, 0)
                     element.label.Position = UDim2.new(0, 0, 0, 0)
                     
                     -- Store the final celebration colors
                     storedESPColors[element.egg.Name] = {
-                        textColor = Color3.fromRGB(255, 215, 0), -- Gold
-                        strokeColor = Color3.fromRGB(255, 140, 0)
+                        textColor = goldColor, -- Gold
+                        strokeColor = goldColor -- Match the text color
                     }
                 end
             end
@@ -514,7 +478,7 @@ espBtn.MouseButton1Click:Connect(function()
             -- Use the last randomized pet value and restore stored colors
             local storedColors = storedESPColors[egg.Name]
             local textColor = storedColors and storedColors.textColor or Color3.fromRGB(255, 215, 0)
-            local strokeColor = storedColors and storedColors.strokeColor or Color3.fromRGB(255, 140, 0)
+            local strokeColor = storedColors and storedColors.strokeColor or textColor -- Match the text color
             showPetESP(egg, "🎉 " .. egg.Name .. " → " .. lastRandomizedPets[egg.Name], textColor, strokeColor)
         end
     end
