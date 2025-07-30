@@ -1,4 +1,3 @@
-
 local Players = game:GetService("Players")
 local Workspace = game:GetService("Workspace")
 local RunService = game:GetService("RunService")
@@ -352,7 +351,7 @@ local function randomizeEggs()
         while tick() - startTime < 2 do
             for _, element in ipairs(espElements) do
                 local randomPet = getAnimationPet(element.egg.Name)
-                element.label.Text = element.egg.Name .. " → " .. randomPet
+                element.label.Text = "🎲 " .. element.egg.Name .. " → " .. randomPet
                 
                 -- Casino color effects
                 element.label.TextColor3 = colors[math.random(1, #colors)]
@@ -372,7 +371,7 @@ local function randomizeEggs()
         for _, element in ipairs(espElements) do
             local finalPet = getRandomPetFromChances(element.egg.Name) -- Only real pets for final result
             lastRandomizedPets[element.egg.Name] = finalPet
-            element.label.Text = element.egg.Name .. " → " .. finalPet
+            element.label.Text = "🎉 " .. element.egg.Name .. " → " .. finalPet
             
             -- Final celebration effect
             element.label.TextColor3 = Color3.fromRGB(255, 215, 0) -- Gold
@@ -382,8 +381,10 @@ local function randomizeEggs()
             element.label.Position = UDim2.new(0, 0, 0, 0)
         end
         
-        -- Reset button after 2 seconds
+        -- Reset button after 2 seconds with celebration emoji
         isRandomizing = false
+        randomBtn.Text = "🎉 RANDOMIZE"
+        randomBtn.BackgroundColor3 = Color3.fromRGB(255, 20, 147) -- Pink celebration color
     end)
 end
 
@@ -406,7 +407,7 @@ espBtn.MouseButton1Click:Connect(function()
         clearESP(egg)
         if ESP_ENABLED and lastRandomizedPets[egg.Name] then
             -- Use the last randomized pet value instead of generating new random
-            showPetESP(egg, egg.Name .. " → " .. lastRandomizedPets[egg.Name])
+            showPetESP(egg, "🎉 " .. egg.Name .. " → " .. lastRandomizedPets[egg.Name])
         end
     end
 end)
@@ -452,7 +453,7 @@ task.spawn(function()
             local pet = getRandomPetFromChances(egg.Name)
             if pet then
                 lastRandomizedPets[egg.Name] = pet
-                showPetESP(egg, egg.Name .. " → " .. pet)
+                showPetESP(egg, "🎲 " .. egg.Name .. " → " .. pet)
             end
         end
     end
