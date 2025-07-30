@@ -454,6 +454,14 @@ local function randomizeEggs()
         
         -- Reset randomization state after 2 seconds
         isRandomizing = false
+        
+        -- Re-enable buttons after animation completes
+        randomBtn.Text = "🎲 RANDOMIZE"
+        randomBtn.BackgroundColor3 = Color3.fromRGB(85, 255, 105) -- Back to original green
+        randomBtn.Active = true -- Re-enable the button
+        
+        espBtn.Active = true -- Re-enable ESP button
+        espBtn.BackgroundColor3 = Color3.fromRGB(60, 60, 60) -- Back to original color
     end)
 end
 
@@ -509,17 +517,6 @@ randomBtn.MouseButton1Click:Connect(function()
     espBtn.BackgroundColor3 = Color3.fromRGB(100, 100, 100) -- Gray out ESP button
     
     randomizeEggs()
-    
-    -- Reset buttons after 2 seconds
-    task.spawn(function()
-        task.wait(2)
-        randomBtn.Text = "🎲 RANDOMIZE"
-        randomBtn.BackgroundColor3 = Color3.fromRGB(85, 255, 105) -- Back to original green
-        randomBtn.Active = true -- Re-enable the button
-        
-        espBtn.Active = true -- Re-enable ESP button
-        espBtn.BackgroundColor3 = Color3.fromRGB(60, 60, 60) -- Back to original color
-    end)
 end)
 
 -- Credit Text
