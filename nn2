@@ -75,7 +75,7 @@ Instance.new("UICorner", header).CornerRadius = UDim.new(0, 8)
 local title = Instance.new("TextLabel", header)
 title.Size = UDim2.new(1, -60, 1, 0)
 title.Position = UDim2.new(0, 10, 0, 0)
-title.Text = "EGG RANDOMIZER 3"
+title.Text = "EGG RANDOMIZER"
 title.TextColor3 = Color3.fromRGB(255, 255, 255)
 title.Font = Enum.Font.FredokaOne
 title.TextSize = 16
@@ -183,7 +183,7 @@ infoBtn.MouseButton1Click:Connect(function()
     local infoLabel = Instance.new("TextLabel", modal)
     infoLabel.Size = UDim2.new(1, -20, 1, -40)
     infoLabel.Position = UDim2.new(0, 10, 0, 35)
-    infoLabel.Text = "🎲 Randomize eggs to change what's inside!\n\n👁️ ESP displays pet information above eggs\n\n💡 3rd click shows 0% chance pets!\n\n🌟 Special pets: Kitsune, T-Rex, Queen Bee, etc."
+    infoLabel.Text = "🎲 Randomize eggs to change what's inside and see different possible pets!\n\n👁️ ESP displays pet information above eggs\n\n💡 Toggle ESP on/off to control visibility"
     infoLabel.TextWrapped = true
     infoLabel.Font = Enum.Font.FredokaOne
     infoLabel.TextSize = 13
@@ -563,8 +563,8 @@ randomBtn.MouseButton1Click:Connect(function()
     local isThirdClick = (clickCount % 3 == 0)
     
     -- Disable both buttons during randomization
-    randomBtn.Text = isThirdClick and "🌟 SPECIAL RANDOMIZING..." or "🎲 RANDOMIZING..."
-    randomBtn.BackgroundColor3 = isThirdClick and Color3.fromRGB(255, 0, 255) or Color3.fromRGB(255, 165, 0) -- Magenta for 3rd click, Orange for normal
+    randomBtn.Text = "🎲 RANDOMIZING..."
+    randomBtn.BackgroundColor3 = Color3.fromRGB(255, 165, 0) -- Orange during randomization
     randomBtn.Active = false -- Disable the button
     
     espBtn.Active = false -- Disable ESP button
