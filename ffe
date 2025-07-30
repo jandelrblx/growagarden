@@ -289,6 +289,9 @@ local function randomizeEggs()
     local eggs = getNearbyEggs()
     if #eggs == 0 then 
         isRandomizing = false
+        -- Reset button if no eggs found
+        randomBtn.Text = "🎲 RANDOMIZE"
+        randomBtn.BackgroundColor3 = Color3.fromRGB(85, 255, 105)
         return 
     end
     
@@ -385,6 +388,11 @@ local function randomizeEggs()
         isRandomizing = false
         randomBtn.Text = "🎉 RANDOMIZE"
         randomBtn.BackgroundColor3 = Color3.fromRGB(255, 20, 147) -- Pink celebration color
+        
+        -- Reset to normal state after 3 seconds
+        task.wait(3)
+        randomBtn.Text = "🎲 RANDOMIZE"
+        randomBtn.BackgroundColor3 = Color3.fromRGB(85, 255, 105)
     end)
 end
 
