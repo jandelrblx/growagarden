@@ -403,6 +403,7 @@ local function randomizeEggs(randomizeButton, espButton, isThirdClick)
                         label.TextYAlignment = Enum.TextYAlignment.Center
                         label.TextStrokeTransparency = 0.5
                         label.TextStrokeColor3 = Color3.fromRGB(0, 0, 0)
+                        label.Text = "🎲 Loading... 🎲" -- Set initial text to prevent "Label"
                         return label
                     end)
                     
