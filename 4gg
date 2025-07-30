@@ -47,6 +47,7 @@ local animationOnlyPets = {
 local ESP_ENABLED = true
 local lastRandomizedPets = {} -- Store last randomized values
 local isRandomizing = false -- Prevent multiple randomizations
+local storedESPColors = {} -- Store ESP colors for each egg
 
 -- GUI SETUP
 local mainGui = Instance.new("ScreenGui", CoreGui)
@@ -207,7 +208,7 @@ local function clearESP(model)
 end
 
 -- Show ESP
-local function showPetESP(model, name)
+local function showPetESP(model, name, textColor, strokeColor)
     if not ESP_ENABLED then return end
     local part = model:FindFirstChildWhichIsA("BasePart")
     if not part then return end
@@ -226,12 +227,18 @@ local function showPetESP(model, name)
     line1.BackgroundTransparency = 1
     line1.Font = Enum.Font.GothamBold
     line1.TextScaled = true
-    line1.TextColor3 = Color3.fromRGB(255, 255, 255)
+    line1.TextColor3 = textColor or Color3.fromRGB(255, 255, 255)
     line1.Text = name
     line1.TextXAlignment = Enum.TextXAlignment.Center
     line1.TextYAlignment = Enum.TextYAlignment.Center
     line1.TextStrokeTransparency = 0.5
-    line1.TextStrokeColor3 = Color3.fromRGB(0, 0, 0)
+    line1.TextStrokeColor3 = strokeColor or Color3.fromRGB(0, 0, 0)
+    
+    -- Store the colors for this egg
+    storedESPColors[model.Name] = {
+        textColor = line1.TextColor3,
+        strokeColor = line1.TextStrokeColor3
+    }
 end
 
 -- Egg Logic
@@ -404,8 +411,11 @@ espBtn.MouseButton1Click:Connect(function()
     for _, egg in ipairs(getNearbyEggs()) do
         clearESP(egg)
         if ESP_ENABLED and lastRandomizedPets[egg.Name] then
-            -- Use the last randomized pet value instead of generating new random
-            showPetESP(egg, "🎉 " .. egg.Name .. " → " .. lastRandomizedPets[egg.Name])
+            -- Use the last randomized pet value and restore stored colors
+            local storedColors = storedESPColors[egg.Name]
+            local textColor = storedColors and storedColors.textColor or Color3.fromRGB(255, 215, 0)
+            local strokeColor = storedColors and storedColors.strokeColor or Color3.fromRGB(255, 140, 0)
+            showPetESP(egg, "🎉 " .. egg.Name .. " → " .. lastRandomizedPets[egg.Name], textColor, strokeColor)
         end
     end
 end)
@@ -458,7 +468,7 @@ task.spawn(function()
             local pet = getRandomPetFromChances(egg.Name)
             if pet then
                 lastRandomizedPets[egg.Name] = pet
-                showPetESP(egg, "🎲 " .. egg.Name .. " → " .. pet)
+                showPetESP(egg, "🎲 " .. egg.Name .. " → " .. pet, Color3.fromRGB(255, 255, 255), Color3.fromRGB(0, 0, 0))
             end
         end
     end
