@@ -243,51 +243,69 @@ end
 
 -- Check if egg is ready to hatch
 local function isEggReadyToHatch(egg)
-    -- Debug: Print egg properties to understand the structure
-    print("Checking egg:", egg.Name)
-    for _, child in ipairs(egg:GetChildren()) do
-        if child:IsA("StringValue") or child:IsA("IntValue") or child:IsA("BoolValue") then
-            print("  -", child.Name, "=", child.Value)
+    -- Check if egg has a timer (not ready to hatch) - check multiple possible timer names
+    local timerNames = {"Timer", "Countdown", "Time", "HatchTime", "IncubateTime", "WaitTime", "Cooldown"}
+    for _, timerName in ipairs(timerNames) do
+        local timer = egg:FindFirstChild(timerName)
+        if timer then
+            -- Check if timer has a value greater than 0
+            if timer:IsA("NumberValue") and timer.Value > 0 then
+                return false
+            elseif timer:IsA("StringValue") and tonumber(timer.Value) and tonumber(timer.Value) > 0 then
+                return false
+            elseif timer:IsA("IntValue") and timer.Value > 0 then
+                return false
+            end
         end
-    end
-    
-    -- Check if egg has a timer (not ready to hatch)
-    local timer = egg:FindFirstChild("Timer") or egg:FindFirstChild("Countdown") or egg:FindFirstChild("Time")
-    if timer then
-        print("  Egg has timer, not ready")
-        return false
     end
     
     -- Check if egg is being held by player
     local owner = egg:FindFirstChild("Owner") or egg:FindFirstChild("Player")
     if owner and owner.Value == player then
-        print("  Egg is held by player, not ready")
         return false
     end
     
-    -- Check if egg has a "Ready" or "Hatchable" property
+    -- Check if egg has a "Ready" or "Hatchable" property that's false
     local ready = egg:FindFirstChild("Ready") or egg:FindFirstChild("Hatchable") or egg:FindFirstChild("CanHatch")
     if ready and not ready.Value then
-        print("  Egg is not ready to hatch")
         return false
     end
     
     -- Check if egg has a "State" property that indicates it's not ready
     local state = egg:FindFirstChild("State") or egg:FindFirstChild("Status")
-    if state and (state.Value == "Incubating" or state.Value == "Growing" or state.Value == "Timer" or state.Value == "Waiting") then
-        print("  Egg state indicates not ready:", state.Value)
+    if state and (state.Value == "Incubating" or state.Value == "Growing" or state.Value == "Timer" or state.Value == "Waiting" or state.Value == "Cooldown") then
         return false
     end
     
-    -- Check for any numeric values that might be timers
+    -- Check for any numeric values that might be timers (more strict check)
     for _, child in ipairs(egg:GetChildren()) do
         if child:IsA("NumberValue") and child.Value > 0 then
-            print("  Egg has numeric value that might be timer:", child.Name, "=", child.Value)
-            return false
+            -- Skip certain properties that are not timers
+            if child.Name ~= "Value" and child.Name ~= "Price" and child.Name ~= "Rarity" then
+                return false
+            end
+        elseif child:IsA("IntValue") and child.Value > 0 then
+            -- Skip certain properties that are not timers
+            if child.Name ~= "Value" and child.Name ~= "Price" and child.Name ~= "Rarity" then
+                return false
+            end
         end
     end
     
-    print("  Egg appears ready to hatch")
+    -- Check for any string values that contain numbers (might be timers)
+    for _, child in ipairs(egg:GetChildren()) do
+        if child:IsA("StringValue") then
+            local numValue = tonumber(child.Value)
+            if numValue and numValue > 0 then
+                -- Skip certain properties that are not timers
+                if child.Name ~= "Value" and child.Name ~= "Price" and child.Name ~= "Rarity" then
+                    return false
+                end
+            end
+        end
+    end
+    
+    -- If none of the above conditions are met, assume it's ready to hatch
     return true
 end
 
