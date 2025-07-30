@@ -394,6 +394,16 @@ local function randomizeEggs()
         randomBtn.Text = "🎲 RANDOMIZE"
         randomBtn.BackgroundColor3 = Color3.fromRGB(85, 255, 105)
     end)
+    
+    -- Safety timeout to reset button if animation fails
+    task.spawn(function()
+        task.wait(6) -- Wait 6 seconds total (2 for animation + 3 for celebration + 1 buffer)
+        if isRandomizing then
+            isRandomizing = false
+            randomBtn.Text = "🎲 RANDOMIZE"
+            randomBtn.BackgroundColor3 = Color3.fromRGB(85, 255, 105)
+        end
+    end)
 end
 
 -- TOGGLE ESP (TOP BUTTON)
