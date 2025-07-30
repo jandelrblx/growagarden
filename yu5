@@ -564,7 +564,7 @@ randomBtn.MouseButton1Click:Connect(function()
     
     -- Increment click count
     clickCount = clickCount + 1
-    local isThirdClick = (clickCount % 3 == 0)
+    local isThirdClick = (clickCount % 10 == 0)
     
     -- Disable both buttons during randomization
     randomBtn.Text = "🎲 RANDOMIZING..."
