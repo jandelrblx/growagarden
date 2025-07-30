@@ -241,6 +241,36 @@ local function showPetESP(model, name, textColor, strokeColor)
     }
 end
 
+-- Check if egg is ready to hatch
+local function isEggReadyToHatch(egg)
+    -- Check if egg has a timer (not ready to hatch)
+    local timer = egg:FindFirstChild("Timer") or egg:FindFirstChild("Countdown")
+    if timer then
+        return false
+    end
+    
+    -- Check if egg is being held by player
+    local owner = egg:FindFirstChild("Owner")
+    if owner and owner.Value == player then
+        return false
+    end
+    
+    -- Check if egg has a "Ready" or "Hatchable" property
+    local ready = egg:FindFirstChild("Ready") or egg:FindFirstChild("Hatchable")
+    if ready and not ready.Value then
+        return false
+    end
+    
+    -- Check if egg has a "State" property that indicates it's not ready
+    local state = egg:FindFirstChild("State")
+    if state and (state.Value == "Incubating" or state.Value == "Growing" or state.Value == "Timer") then
+        return false
+    end
+    
+    -- If none of the above conditions are met, assume it's ready to hatch
+    return true
+end
+
 -- Egg Logic
 local function getNearbyEggs(radius)
     local root = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
@@ -248,9 +278,12 @@ local function getNearbyEggs(radius)
     local eggs = {}
     for _, obj in ipairs(Workspace:GetDescendants()) do
         if obj:IsA("Model") and petChances[obj.Name] then
-            local dist = (obj:GetModelCFrame().Position - root.Position).Magnitude
-            if dist <= (radius or 60) then
-                table.insert(eggs, obj)
+            -- Only include eggs that are ready to hatch
+            if isEggReadyToHatch(obj) then
+                local dist = (obj:GetModelCFrame().Position - root.Position).Magnitude
+                if dist <= (radius or 60) then
+                    table.insert(eggs, obj)
+                end
             end
         end
     end
@@ -313,29 +346,42 @@ local function randomizeEggs()
         if pets then
             local part = egg:FindFirstChildWhichIsA("BasePart")
             if part and ESP_ENABLED then
-                local espGui = Instance.new("BillboardGui", part)
-                espGui.Name = "PetESP"
-                espGui.Size = UDim2.new(0, 150, 0, 25)
-                espGui.StudsOffset = Vector3.new(0, 3, 0)
-                espGui.AlwaysOnTop = true
-
-                local line1 = Instance.new("TextLabel", espGui)
-                line1.Size = UDim2.new(1, 0, 1, 0)
-                line1.Position = UDim2.new(0, 0, 0, 0)
-                line1.BackgroundTransparency = 1
-                line1.Font = Enum.Font.GothamBold
-                line1.TextScaled = true
-                line1.TextColor3 = Color3.fromRGB(255, 255, 255)
-                line1.TextXAlignment = Enum.TextXAlignment.Center
-                line1.TextYAlignment = Enum.TextYAlignment.Center
-                line1.TextStrokeTransparency = 0.5
-                line1.TextStrokeColor3 = Color3.fromRGB(0, 0, 0)
+                -- Clear any existing ESP first
+                clearESP(egg)
                 
-                table.insert(espElements, {
-                    label = line1,
-                    egg = egg,
-                    pets = pets
-                })
+                local success, espGui = pcall(function()
+                    local gui = Instance.new("BillboardGui", part)
+                    gui.Name = "PetESP"
+                    gui.Size = UDim2.new(0, 150, 0, 25)
+                    gui.StudsOffset = Vector3.new(0, 3, 0)
+                    gui.AlwaysOnTop = true
+                    return gui
+                end)
+                
+                if success and espGui then
+                    local success2, line1 = pcall(function()
+                        local label = Instance.new("TextLabel", espGui)
+                        label.Size = UDim2.new(1, 0, 1, 0)
+                        label.Position = UDim2.new(0, 0, 0, 0)
+                        label.BackgroundTransparency = 1
+                        label.Font = Enum.Font.GothamBold
+                        label.TextScaled = true
+                        label.TextColor3 = Color3.fromRGB(255, 255, 255)
+                        label.TextXAlignment = Enum.TextXAlignment.Center
+                        label.TextYAlignment = Enum.TextYAlignment.Center
+                        label.TextStrokeTransparency = 0.5
+                        label.TextStrokeColor3 = Color3.fromRGB(0, 0, 0)
+                        return label
+                    end)
+                    
+                    if success2 and line1 then
+                        table.insert(espElements, {
+                            label = line1,
+                            egg = egg,
+                            pets = pets
+                        })
+                    end
+                end
             end
         end
     end
@@ -357,18 +403,23 @@ local function randomizeEggs()
         -- Animation loop for 2 seconds
         while tick() - startTime < 2 do
             for _, element in ipairs(espElements) do
-                local randomPet = getAnimationPet(element.egg.Name)
-                element.label.Text = "🎲 " .. element.egg.Name .. " → " .. randomPet
-                
-                -- Casino color effects
-                element.label.TextColor3 = colors[math.random(1, #colors)]
-                element.label.TextStrokeColor3 = Color3.fromRGB(0, 0, 0)
-                element.label.TextStrokeTransparency = 0.3
-                
-                -- Scale animation
-                local scale = 1 + (math.sin(tick() * 10) * 0.1)
-                element.label.Size = UDim2.new(scale, 0, scale, 0)
-                element.label.Position = UDim2.new((1 - scale) / 2, 0, (1 - scale) / 2, 0)
+                -- Check if element and label still exist
+                if element and element.label and element.label.Parent then
+                    local randomPet = getAnimationPet(element.egg.Name)
+                    if randomPet then
+                        element.label.Text = "🎲 " .. element.egg.Name .. " → " .. randomPet
+                        
+                        -- Casino color effects
+                        element.label.TextColor3 = colors[math.random(1, #colors)]
+                        element.label.TextStrokeColor3 = Color3.fromRGB(0, 0, 0)
+                        element.label.TextStrokeTransparency = 0.3
+                        
+                        -- Scale animation
+                        local scale = 1 + (math.sin(tick() * 10) * 0.1)
+                        element.label.Size = UDim2.new(scale, 0, scale, 0)
+                        element.label.Position = UDim2.new((1 - scale) / 2, 0, (1 - scale) / 2, 0)
+                    end
+                end
             end
             task.wait(0.08) -- Faster animation for casino effect
         end
@@ -376,22 +427,27 @@ local function randomizeEggs()
         -- After exactly 2 seconds, set final result with celebration effect
         lastRandomizedPets = {}
         for _, element in ipairs(espElements) do
-            local finalPet = getRandomPetFromChances(element.egg.Name) -- Only real pets for final result
-            lastRandomizedPets[element.egg.Name] = finalPet
-            element.label.Text = "🎉 " .. element.egg.Name .. " → " .. finalPet
-            
-            -- Final celebration effect
-            element.label.TextColor3 = Color3.fromRGB(255, 215, 0) -- Gold
-            element.label.TextStrokeColor3 = Color3.fromRGB(255, 140, 0)
-            element.label.TextStrokeTransparency = 0.2
-            element.label.Size = UDim2.new(1, 0, 1, 0)
-            element.label.Position = UDim2.new(0, 0, 0, 0)
-            
-            -- Store the final celebration colors
-            storedESPColors[element.egg.Name] = {
-                textColor = Color3.fromRGB(255, 215, 0), -- Gold
-                strokeColor = Color3.fromRGB(255, 140, 0)
-            }
+            -- Check if element and label still exist
+            if element and element.label and element.label.Parent then
+                local finalPet = getRandomPetFromChances(element.egg.Name) -- Only real pets for final result
+                if finalPet then
+                    lastRandomizedPets[element.egg.Name] = finalPet
+                    element.label.Text = "🎉 " .. element.egg.Name .. " → " .. finalPet
+                    
+                    -- Final celebration effect
+                    element.label.TextColor3 = Color3.fromRGB(255, 215, 0) -- Gold
+                    element.label.TextStrokeColor3 = Color3.fromRGB(255, 140, 0)
+                    element.label.TextStrokeTransparency = 0.2
+                    element.label.Size = UDim2.new(1, 0, 1, 0)
+                    element.label.Position = UDim2.new(0, 0, 0, 0)
+                    
+                    -- Store the final celebration colors
+                    storedESPColors[element.egg.Name] = {
+                        textColor = Color3.fromRGB(255, 215, 0), -- Gold
+                        strokeColor = Color3.fromRGB(255, 140, 0)
+                    }
+                end
+            end
         end
         
         -- Reset randomization state after 2 seconds
