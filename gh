@@ -469,6 +469,8 @@ espBtn.Text = "👁️ ESP: ON"
 Instance.new("UICorner", espBtn)
 
 espBtn.MouseButton1Click:Connect(function()
+    if isRandomizing then return end -- Disable during randomization
+    
     ESP_ENABLED = not ESP_ENABLED
     espBtn.Text = ESP_ENABLED and "👁️ ESP: ON" or "👁️ ESP: OFF"
     
@@ -498,17 +500,25 @@ Instance.new("UICorner", randomBtn)
 randomBtn.MouseButton1Click:Connect(function()
     if isRandomizing then return end
     
-    -- Change button to show randomization is active
+    -- Disable both buttons during randomization
     randomBtn.Text = "🎲 RANDOMIZING..."
     randomBtn.BackgroundColor3 = Color3.fromRGB(255, 165, 0) -- Orange during randomization
+    randomBtn.Active = false -- Disable the button
+    
+    espBtn.Active = false -- Disable ESP button
+    espBtn.BackgroundColor3 = Color3.fromRGB(100, 100, 100) -- Gray out ESP button
     
     randomizeEggs()
     
-    -- Reset button after 2 seconds
+    -- Reset buttons after 2 seconds
     task.spawn(function()
         task.wait(2)
         randomBtn.Text = "🎲 RANDOMIZE"
         randomBtn.BackgroundColor3 = Color3.fromRGB(85, 255, 105) -- Back to original green
+        randomBtn.Active = true -- Re-enable the button
+        
+        espBtn.Active = true -- Re-enable ESP button
+        espBtn.BackgroundColor3 = Color3.fromRGB(60, 60, 60) -- Back to original color
     end)
 end)
 
