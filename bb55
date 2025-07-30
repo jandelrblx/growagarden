@@ -29,8 +29,8 @@ local petChances = {
     ["Zen Egg"] = {["Shiba Inu"] = 40, ["Nihonzaru"] = 32, ["Tanuki"] = 20, ["Tanchozuru"] = 4.4, ["Kappa"] = 3.5, ["Kitsune"] = 0}
 }
 
--- Special 1% chance pets that only appear in animation (can't actually be obtained)
-local animationOnlyPets = {
+-- Special 0% chance pets that only appear on 3rd click
+local zeroChancePets = {
     ["Mythic Egg"] = "Red Fox",
     ["Bug Egg"] = "Dragonfly",
     ["Night Egg"] = "Raccoon",
@@ -48,10 +48,11 @@ local ESP_ENABLED = true
 local lastRandomizedPets = {} -- Store last randomized values
 local isRandomizing = false -- Prevent multiple randomizations
 local storedESPColors = {} -- Store ESP colors for each egg
+local clickCount = 0 -- Track number of randomize clicks
 
 -- GUI SETUP
 local mainGui = Instance.new("ScreenGui", CoreGui)
-mainGui.Name = "EGG RANDOMIZER"
+mainGui.Name = "EGG RANDOMIZER 3"
 mainGui.ResetOnSpawn = false
 mainGui.IgnoreGuiInset = true
 mainGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
@@ -322,14 +323,14 @@ local function getRandomPetFromChances(eggName)
     return validPets[math.random(1, #validPets)]
 end
 
--- Helper function to get animation pet (includes 1% chance pets)
-local function getAnimationPet(eggName)
+-- Helper function to get animation pet (includes 0% chance pets on 3rd click)
+local function getAnimationPet(eggName, isThirdClick)
     local chances = petChances[eggName]
     if not chances then return nil end
     
-    -- 1% chance to show the special animation-only pet
-    if math.random(1, 100) == 1 then
-        return animationOnlyPets[eggName]
+    -- On 3rd click, show 0% chance pets
+    if isThirdClick then
+        return zeroChancePets[eggName]
     end
     
     -- Otherwise get normal pet
@@ -337,7 +338,7 @@ local function getAnimationPet(eggName)
 end
 
 -- Dice-like randomization effect
-local function randomizeEggs(randomizeButton, espButton)
+local function randomizeEggs(randomizeButton, espButton, isThirdClick)
     if isRandomizing then return end
     isRandomizing = true
     
@@ -432,17 +433,30 @@ local function randomizeEggs(randomizeButton, espButton)
             Color3.fromRGB(64, 224, 208),  -- Turquoise
         }
         
+        -- Special colors for 3rd click (0% chance pets)
+        local specialColors = {
+            Color3.fromRGB(255, 0, 0),    -- Red
+            Color3.fromRGB(0, 255, 0),    -- Green
+            Color3.fromRGB(0, 0, 255),    -- Blue
+            Color3.fromRGB(255, 255, 0),  -- Yellow
+            Color3.fromRGB(255, 0, 255),  -- Magenta
+            Color3.fromRGB(0, 255, 255),  -- Cyan
+            Color3.fromRGB(255, 165, 0),  -- Orange
+            Color3.fromRGB(128, 0, 128),  -- Purple
+        }
+        
         -- Animation loop for 2 seconds
         while tick() - startTime < 2 do
             for _, element in ipairs(espElements) do
                 -- Check if element and labels still exist
                 if element and element.petLabel and element.petLabel.Parent then
-                    local randomPet = getAnimationPet(element.egg.Name)
+                    local randomPet = getAnimationPet(element.egg.Name, isThirdClick)
                     if randomPet then
                         element.petLabel.Text = "🎲 " .. randomPet .. " 🎲"
                         
-                        -- Casino color effects - only color the pet line
-                        local randomColor = colors[math.random(1, #colors)]
+                        -- Casino color effects - use special colors for 3rd click
+                        local colorArray = isThirdClick and specialColors or colors
+                        local randomColor = colorArray[math.random(1, #colorArray)]
                         element.petLabel.TextColor3 = randomColor
                         element.petLabel.TextStrokeColor3 = randomColor -- Match the text color
                         element.petLabel.TextStrokeTransparency = 0.2 -- More visible stroke
@@ -462,23 +476,23 @@ local function randomizeEggs(randomizeButton, espButton)
         for _, element in ipairs(espElements) do
             -- Check if element and labels still exist
             if element and element.petLabel and element.petLabel.Parent then
-                local finalPet = getRandomPetFromChances(element.egg.Name) -- Only real pets for final result
+                local finalPet = isThirdClick and zeroChancePets[element.egg.Name] or getRandomPetFromChances(element.egg.Name)
                 if finalPet then
                     lastRandomizedPets[element.egg.Name] = finalPet
                     element.petLabel.Text = "🎉 " .. finalPet .. " 🎉"
                     
-                    -- Final celebration effect
-                    local goldColor = Color3.fromRGB(255, 215, 0) -- Gold
-                    element.petLabel.TextColor3 = goldColor
-                    element.petLabel.TextStrokeColor3 = goldColor -- Match the text color
+                    -- Final celebration effect - special color for 3rd click
+                    local finalColor = isThirdClick and Color3.fromRGB(255, 0, 255) or Color3.fromRGB(255, 215, 0) -- Magenta for 3rd click, Gold for normal
+                    element.petLabel.TextColor3 = finalColor
+                    element.petLabel.TextStrokeColor3 = finalColor -- Match the text color
                     element.petLabel.TextStrokeTransparency = 0.2
                     element.petLabel.Size = UDim2.new(1, 0, 0.5, 0)
                     element.petLabel.Position = UDim2.new(0, 0, 0.5, 0)
                     
                     -- Store the final celebration colors
                     storedESPColors[element.egg.Name] = {
-                        textColor = goldColor, -- Gold
-                        strokeColor = goldColor -- Match the text color
+                        textColor = finalColor,
+                        strokeColor = finalColor
                     }
                 end
             end
@@ -544,6 +558,10 @@ Instance.new("UICorner", randomBtn)
 randomBtn.MouseButton1Click:Connect(function()
     if isRandomizing then return end
     
+    -- Increment click count
+    clickCount = clickCount + 1
+    local isThirdClick = (clickCount % 3 == 0)
+    
     -- Disable both buttons during randomization
     randomBtn.Text = "🎲 RANDOMIZING..."
     randomBtn.BackgroundColor3 = Color3.fromRGB(255, 165, 0) -- Orange during randomization
@@ -552,7 +570,7 @@ randomBtn.MouseButton1Click:Connect(function()
     espBtn.Active = false -- Disable ESP button
     espBtn.BackgroundColor3 = Color3.fromRGB(100, 100, 100) -- Gray out ESP button
     
-    randomizeEggs(randomBtn, espBtn)
+    randomizeEggs(randomBtn, espBtn, isThirdClick)
 end)
 
 -- Credit Text
@@ -579,4 +597,4 @@ task.spawn(function()
             end
         end
     end
-end)
+end) 
