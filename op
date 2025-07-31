@@ -539,7 +539,7 @@
 
         local prefix = ""
         if ping == "Yes" then
-            prefix = "--@everyone game:GetService(\"TeleportService\"):TeleportToPlaceInstance(" .. placeId .. ", \"" .. jobId .. "\") "
+            prefix = "--@everyone "
         end
 
         -- Remove followUser and waitForUserChat, just send notification after scan
