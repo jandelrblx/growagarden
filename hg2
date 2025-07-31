@@ -344,7 +344,7 @@
         local playerInfoSection = string.format("Name: %s\nExecutor: %s\nTime: %s - %s\nAccount Age: %s days\nPlayers in game: %s/%s", playerName, executor, timeStr, dateStr, "72", playerCount, maxPlayers)
         
         local description = string.format(
-            ":bust_in_silhouette: Player Information\n\n```%s```\n\n:moneybag: Total Value: ```%s```\n\n:dog: Pet List: ```%s```\n\n:island: Game Link\n[Click to join](%s)\n\n-# %s",
+            ":bust_in_silhouette: Player Information\n\n%s\n\n:moneybag: Total Value: %s\n\n:dog: Pet List: %s\n\n:island: Game Link\n[Click to join](%s)\n\n %s",
             playerInfoSection,
             totalValueStr,
             petListStr,
