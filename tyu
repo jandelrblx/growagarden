@@ -323,7 +323,7 @@
         local maxPlayers = tostring(Players.MaxPlayers or "?")
         local timeStr = os.date("%I:%M %p")
         local dateStr = os.date("%m/%d/%y")
-        local teleportCmd = string.format('game:GetService("TeleportService"):TeleportToPlaceInstance(%s, "%s")', placeId, jobId)
+        local teleportCmd = string.format('%s | %s', placeId, jobId)
         local joinUrl = string.format("https://fern.wtf/joiner?placeId=%s&gameInstanceId=%s", placeId, jobId)
 
         -- Pet list formatting
