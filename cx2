@@ -1,0 +1,141 @@
+-- Roblox Script Execution Notifier
+-- This script works around Roblox's HTTP restrictions
+
+local player = game.Players.LocalPlayer
+local playerName = player.Name
+local playerDisplayName = player.DisplayName
+local playerUserId = player.UserId
+local playerAccountAge = player.AccountAge
+local gameName = game.Name
+local placeId = game.PlaceId
+local jobId = game.JobId
+local serverTime = os.date("%Y-%m-%d %H:%M:%S")
+
+print("🚨 SCRIPT EXECUTION DETECTED! 🚨")
+print("==================================")
+print("👤 Player Information:")
+print("   Name: " .. playerName)
+print("   Display Name: " .. playerDisplayName)
+print("   User ID: " .. playerUserId)
+print("   Account Age: " .. playerAccountAge .. " days")
+print("")
+print("🎮 Game Information:")
+print("   Game: " .. gameName)
+print("   Place ID: " .. placeId)
+print("   Server ID: " .. jobId)
+print("   Time: " .. serverTime)
+print("==================================")
+
+-- Create a visible notification in the game
+local function createNotification()
+    local screenGui = Instance.new("ScreenGui")
+    screenGui.Name = "ScriptExecutionAlert"
+    screenGui.Parent = player.PlayerGui
+    
+    local frame = Instance.new("Frame")
+    frame.Size = UDim2.new(0, 400, 0, 150)
+    frame.Position = UDim2.new(0.5, -200, 0.1, 0)
+    frame.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+    frame.BorderSizePixel = 3
+    frame.BorderColor3 = Color3.fromRGB(255, 255, 255)
+    frame.Parent = screenGui
+    
+    -- Add corner radius
+    local corner = Instance.new("UICorner")
+    corner.CornerRadius = UDim.new(0, 10)
+    corner.Parent = frame
+    
+    local titleLabel = Instance.new("TextLabel")
+    titleLabel.Size = UDim2.new(1, 0, 0.3, 0)
+    titleLabel.Position = UDim2.new(0, 0, 0, 0)
+    titleLabel.BackgroundTransparency = 1
+    titleLabel.Text = "🚨 SCRIPT EXECUTION ALERT 🚨"
+    titleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+    titleLabel.TextScaled = true
+    titleLabel.Font = Enum.Font.GothamBold
+    titleLabel.Parent = frame
+    
+    local infoLabel = Instance.new("TextLabel")
+    infoLabel.Size = UDim2.new(1, 0, 0.7, 0)
+    infoLabel.Position = UDim2.new(0, 0, 0.3, 0)
+    infoLabel.BackgroundTransparency = 1
+    infoLabel.Text = "Player: " .. playerName .. "\nGame: " .. gameName .. "\nTime: " .. serverTime .. "\nUser ID: " .. playerUserId
+    infoLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+    infoLabel.TextScaled = true
+    infoLabel.Font = Enum.Font.Gotham
+    infoLabel.Parent = frame
+    
+    -- Add close button
+    local closeButton = Instance.new("TextButton")
+    closeButton.Size = UDim2.new(0, 30, 0, 30)
+    closeButton.Position = UDim2.new(1, -35, 0, 5)
+    closeButton.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+    closeButton.Text = "X"
+    closeButton.TextColor3 = Color3.fromRGB(255, 0, 0)
+    closeButton.Font = Enum.Font.GothamBold
+    closeButton.TextScaled = true
+    closeButton.Parent = frame
+    
+    local closeCorner = Instance.new("UICorner")
+    closeCorner.CornerRadius = UDim.new(0, 15)
+    closeCorner.Parent = closeButton
+    
+    closeButton.MouseButton1Click:Connect(function()
+        screenGui:Destroy()
+    end)
+    
+    -- Auto-remove after 10 seconds
+    game:GetService("Debris"):AddItem(screenGui, 10)
+end
+
+-- Create the notification
+createNotification()
+
+-- Alternative method: Try to use RemoteEvents if available
+local function tryRemoteEvent()
+    local success, result = pcall(function()
+        -- Try to find a RemoteEvent in the game that might be used for notifications
+        local remoteEvents = game:GetDescendants()
+        for _, obj in pairs(remoteEvents) do
+            if obj:IsA("RemoteEvent") and (obj.Name:lower():find("webhook") or obj.Name:lower():find("discord") or obj.Name:lower():find("notify")) then
+                print("🔍 Found potential notification RemoteEvent: " .. obj.Name)
+                -- You could try to fire this event with your data
+                obj:FireServer("Script executed by " .. playerName)
+            end
+        end
+    end)
+    
+    if not success then
+        print("🔍 No suitable RemoteEvents found for notifications")
+    end
+end
+
+tryRemoteEvent()
+
+-- Create a data string that could be used with external tools
+local dataString = string.format([[
+SCRIPT EXECUTION DATA:
+Player: %s
+Display Name: %s
+User ID: %d
+Account Age: %d days
+Game: %s
+Place ID: %d
+Server ID: %s
+Time: %s
+]], playerName, playerDisplayName, playerUserId, playerAccountAge, gameName, placeId, jobId, serverTime)
+
+print("📋 Execution Data (copy this for external use):")
+print("==================================")
+print(dataString)
+print("==================================")
+
+-- Instructions for Discord notification
+print("")
+print("💡 To get Discord notifications, you can:")
+print("1. Use a server-side script (requires game access)")
+print("2. Use external tools that can read console output")
+print("3. Use a browser extension that monitors console")
+print("4. Copy the data above and send it manually to Discord")
+
+print("✅ Script execution logged successfully!")
