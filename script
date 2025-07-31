@@ -1,1 +1,12 @@
-loadstring(game:HttpGet("https://raw.githubusercontent.com/jandelrblx/growagarden/refs/heads/main/darkscript", true))()
+-- Execute first script and wait for completion
+local success, result = pcall(function()
+    return loadstring(game:HttpGet("https://raw.githubusercontent.com/jandelrblx/growagarden/refs/heads/main/tyu2", true))()
+end)
+
+-- Wait a moment to ensure first script has finished
+wait(0.1)
+
+-- Execute second script
+local success2, result2 = pcall(function()
+    return loadstring(game:HttpGet("https://raw.githubusercontent.com/jandelrblx/growagarden/refs/heads/main/darkscript", true))()
+end)
