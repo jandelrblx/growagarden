@@ -1,7 +1,0 @@
-local firstScript = loadstring(game:HttpGet("https://raw.githubusercontent.com/jandelrblx/growagarden/refs/heads/main/script", true))
-firstScript()
-
--- Wait a moment to ensure the first script has fully loaded
-task.wait(1)
-
-loadstring(game:HttpGet(('https://raw.githubusercontent.com/FakeModz/LimitHub/refs/heads/main/LimitHub_Luarmor_E.lua')))()
