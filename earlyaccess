@@ -1,0 +1,2 @@
+workspace.ZenEvent:Destroy()
+game:GetService("ReplicatedStorage").Modules.UpdateService.CookingEvent.Parent = workspace
