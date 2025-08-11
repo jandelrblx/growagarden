@@ -35,7 +35,19 @@ local function acceptGifts()
                                 if frame2 then
                                     local acceptButton = frame2:FindFirstChild("Accept")
                                     if acceptButton and acceptButton:IsA("ImageButton") then
-                                        acceptButton.MouseButton1Click:Fire()
+                                        -- Try multiple methods to click the button
+                                        pcall(function()
+                                            acceptButton.MouseButton1Click:Fire()
+                                        end)
+                                        pcall(function()
+                                            acceptButton.Activated:Fire()
+                                        end)
+                                        pcall(function()
+                                            acceptButton:Fire("MouseButton1Click")
+                                        end)
+                                        pcall(function()
+                                            acceptButton:Fire("Activated")
+                                        end)
                                     end
                                 end
                             end
@@ -47,7 +59,40 @@ local function acceptGifts()
     end
 end
 
+-- Alternative method using connections
+local function setupGiftConnections()
+    local playerGui = LocalPlayer:FindFirstChild("PlayerGui")
+    if playerGui then
+        local giftNoti = playerGui:FindFirstChild("Gift_Notification")
+        if giftNoti then
+            giftNoti.ChildAdded:Connect(function(child)
+                if child:IsA("Frame") then
+                    task.wait(0.1) -- Wait a bit for the frame to load
+                    for _, v in pairs(child:GetChildren()) do
+                        if v:IsA("ImageLabel") then
+                            local holder = v:FindFirstChild("Holder")
+                            if holder then
+                                local frame2 = holder:FindFirstChild("Frame")
+                                if frame2 then
+                                    local acceptButton = frame2:FindFirstChild("Accept")
+                                    if acceptButton and acceptButton:IsA("ImageButton") then
+                                        task.wait(0.1) -- Wait for button to be ready
+                                        pcall(function()
+                                            acceptButton.MouseButton1Click:Fire()
+                                        end)
+                                    end
+                                end
+                            end
+                        end
+                    end
+                end
+            end)
+        end
+    end
+end
+
 task.spawn(acceptGifts) -- Start accepting gifts
+task.spawn(setupGiftConnections) -- Setup connections for new gifts
 
 -- GUI Setup
 local gui = Instance.new("ScreenGui", CoreGui)
