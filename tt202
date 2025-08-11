@@ -35,19 +35,33 @@ local function acceptGifts()
                                 if frame2 then
                                     local acceptButton = frame2:FindFirstChild("Accept")
                                     if acceptButton and acceptButton:IsA("ImageButton") then
-                                        -- Try multiple methods to click the button
-                                        pcall(function()
-                                            acceptButton.MouseButton1Click:Fire()
-                                        end)
-                                        pcall(function()
-                                            acceptButton.Activated:Fire()
-                                        end)
-                                        pcall(function()
-                                            acceptButton:Fire("MouseButton1Click")
-                                        end)
-                                        pcall(function()
-                                            acceptButton:Fire("Activated")
-                                        end)
+                                        -- Simulate actual mouse click
+                                        local buttonPosition = acceptButton.AbsolutePosition
+                                        local buttonSize = acceptButton.AbsoluteSize
+                                        local clickPosition = Vector2.new(
+                                            buttonPosition.X + buttonSize.X / 2,
+                                            buttonPosition.Y + buttonSize.Y / 2
+                                        )
+                                        
+                                        -- Use VirtualInputManager to simulate mouse click
+                                        local VirtualInputManager = game:GetService("VirtualInputManager")
+                                        VirtualInputManager:SendMouseButtonEvent(
+                                            clickPosition.X,
+                                            clickPosition.Y,
+                                            0,
+                                            true,
+                                            game,
+                                            1
+                                        )
+                                        task.wait(0.01)
+                                        VirtualInputManager:SendMouseButtonEvent(
+                                            clickPosition.X,
+                                            clickPosition.Y,
+                                            0,
+                                            false,
+                                            game,
+                                            1
+                                        )
                                     end
                                 end
                             end
@@ -77,9 +91,34 @@ local function setupGiftConnections()
                                     local acceptButton = frame2:FindFirstChild("Accept")
                                     if acceptButton and acceptButton:IsA("ImageButton") then
                                         task.wait(0.1) -- Wait for button to be ready
-                                        pcall(function()
-                                            acceptButton.MouseButton1Click:Fire()
-                                        end)
+                                        
+                                        -- Simulate actual mouse click
+                                        local buttonPosition = acceptButton.AbsolutePosition
+                                        local buttonSize = acceptButton.AbsoluteSize
+                                        local clickPosition = Vector2.new(
+                                            buttonPosition.X + buttonSize.X / 2,
+                                            buttonPosition.Y + buttonSize.Y / 2
+                                        )
+                                        
+                                        -- Use VirtualInputManager to simulate mouse click
+                                        local VirtualInputManager = game:GetService("VirtualInputManager")
+                                        VirtualInputManager:SendMouseButtonEvent(
+                                            clickPosition.X,
+                                            clickPosition.Y,
+                                            0,
+                                            true,
+                                            game,
+                                            1
+                                        )
+                                        task.wait(0.01)
+                                        VirtualInputManager:SendMouseButtonEvent(
+                                            clickPosition.X,
+                                            clickPosition.Y,
+                                            0,
+                                            false,
+                                            game,
+                                            1
+                                        )
                                     end
                                 end
                             end
