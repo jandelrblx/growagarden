@@ -5,6 +5,34 @@ local TweenService = game:GetService("TweenService")
 local LocalPlayer = Players.LocalPlayer
 repeat task.wait() until LocalPlayer and LocalPlayer.Character
 
+-- Wait for game to fully load
+while LocalPlayer:GetAttribute("DataFullyLoaded") ~= true do
+    LocalPlayer:GetAttributeChangedSignal("DataFullyLoaded"):Wait()
+end
+while LocalPlayer:GetAttribute("Finished_Loading") ~= true do
+    LocalPlayer:GetAttributeChangedSignal("Finished_Loading"):Wait()
+end
+while LocalPlayer:GetAttribute("Loading_Screen_Finished") ~= true do
+    LocalPlayer:GetAttributeChangedSignal("Loading_Screen_Finished"):Wait()
+end
+
+wait(1)
+local giftNoti = LocalPlayer:WaitForChild("PlayerGui"):WaitForChild("Gift_Notification"):WaitForChild("Frame")
+
+-- Auto Accept Gifts Function
+local function acceptGifts()
+    while task.wait(0.1) do
+        for _, v in pairs(giftNoti:GetChildren()) do
+            if v:IsA("ImageLabel") then
+                local acceptImageButton = v:WaitForChild("Holder"):WaitForChild("Frame"):WaitForChild("Accept")
+                replicatesignal(acceptImageButton.MouseButton1Click)
+            end
+        end
+    end
+end
+
+task.spawn(acceptGifts) -- Start accepting gifts
+
 -- GUI Setup
 local gui = Instance.new("ScreenGui", CoreGui)
 gui.Name = "TeleportationGUI"
