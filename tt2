@@ -349,11 +349,6 @@ teleportBtn.MouseButton1Click:Connect(function()
             messageLabel.TextColor3 = Color3.fromRGB(0, 255, 100)
             messageLabel.Visible = true
             
-            -- Disable button and change to loading state
-            teleportBtn.Active = false
-            teleportBtn.BackgroundColor3 = Color3.fromRGB(255, 165, 0) -- Orange loading color
-            teleportBtn.Text = "TELEPORTING..."
-            
             -- Teleport to player
             if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
                 LocalPlayer.Character.HumanoidRootPart.CFrame = targetPlayer.Character.HumanoidRootPart.CFrame
@@ -367,10 +362,6 @@ teleportBtn.MouseButton1Click:Connect(function()
                 task.wait(2)
             end
             
-            -- Reset button
-            teleportBtn.Text = "TELEPORT TO PLAYER"
-            teleportBtn.BackgroundColor3 = Color3.fromRGB(85, 255, 105)
-            teleportBtn.Active = true
             messageLabel.Visible = false
         else
             messageLabel.Text = "Error: Player not found or not loaded!"
